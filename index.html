@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#f6f6fb" />
-  <title>Digital Workforce HQ · V3</title>
+  <title>Digital Workforce HQ · V4.1 Live</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <style>
 *{box-sizing:border-box}
@@ -387,6 +387,52 @@ button{cursor:pointer}
   .inspector.mobile-open{transform:translateY(0) !important}
 }
 
+
+/* ===== V4 LIVE n8n CONNECTION ===== */
+.system-live{cursor:pointer}
+.system-live.live-connected .live-dot{box-shadow:0 0 0 5px rgba(46,189,116,.11),0 0 14px rgba(46,189,116,.34)}
+.system-live.live-error .live-dot{background:var(--red);box-shadow:0 0 0 5px rgba(233,84,93,.08)}
+.connection-modal{
+  position:fixed;inset:0;z-index:200;
+  display:none;place-items:center;padding:20px;
+  background:rgba(31,32,48,.24);backdrop-filter:blur(10px)
+}
+.connection-modal.open{display:grid}
+.connection-dialog{
+  width:min(520px,100%);
+  border:1px solid rgba(218,218,229,.94);
+  border-radius:18px;background:rgba(255,255,255,.98);
+  box-shadow:0 24px 80px rgba(38,40,68,.20);padding:20px
+}
+.connection-dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.connection-dialog-head .eyebrow{font-size:8px;font-weight:800;letter-spacing:.08em;color:var(--purple)}
+.connection-dialog-head h2{margin:4px 0 0;font-size:24px;letter-spacing:-.035em}
+#connection-close{border:0;background:none;font-size:25px;color:#8c8e9d;line-height:1}
+.connection-dialog p{font-size:11px;line-height:1.55;color:#717482;margin:14px 0}
+.connection-dialog label{display:block;font-size:9px;font-weight:750;color:#565967;margin-bottom:7px}
+.connection-dialog input{
+  width:100%;height:44px;border:1px solid #dcdde7;border-radius:10px;
+  padding:0 12px;background:#fbfbfd;color:#252637;font-size:12px;outline:none
+}
+.connection-dialog input:focus{border-color:#8e87e5;box-shadow:0 0 0 3px rgba(98,89,217,.08)}
+.connection-actions{display:grid;grid-template-columns:110px 1fr;gap:9px;margin-top:12px}
+.connection-actions button{height:38px;border-radius:8px;font-size:9px;font-weight:800}
+.connection-secondary{border:1px solid #d8d8e5;background:#fff;color:#727484}
+.connection-primary{border:1px solid var(--purple);background:var(--purple);color:#fff}
+.connection-test{min-height:18px;margin-top:9px;font-size:9px;color:#777987}
+.connection-test.ok{color:var(--green)}.connection-test.bad{color:var(--red)}
+#n8n-connection-state{cursor:pointer}
+#n8n-connection-state.disconnected{color:#999baa}
+#n8n-connection-state.connected{color:#3dbb73}
+#n8n-connection-state.error{color:var(--red)}
+@media(max-width:900px){
+  .connection-modal{padding:10px;align-items:end}
+  .connection-dialog{border-radius:20px;padding:16px;margin-bottom:7px}
+  .connection-dialog-head h2{font-size:20px}
+  .connection-dialog p{font-size:10px}
+  .connection-actions{grid-template-columns:90px 1fr}
+}
+
 </style>
 </head>
 <body>
@@ -562,7 +608,7 @@ button{cursor:pointer}
           <h3>SYSTEM STATUS</h3>
           <dl>
             <div><dt><i></i>LAST SYNC</dt><dd id="last-sync">21:46:13 <i></i></dd></div>
-            <div><dt><i></i>n8n</dt><dd>CONNECTED <i></i></dd></div>
+            <div><dt><i></i>n8n</dt><dd id="n8n-connection-state" class="disconnected">CONNECT <i></i></dd></div>
             <div><dt><i></i>GitHub</dt><dd>CONNECTED <i></i></dd></div>
             <div><dt><i></i>WATCHTOWER HEARTBEAT</dt><dd>OK <i></i></dd></div>
           </dl>
@@ -573,10 +619,8 @@ button{cursor:pointer}
 
   <script>
     window.DWHQ_CONFIG = {
-      // Paste a READ-ONLY n8n webhook URL here later.
-      // Never put n8n credentials, API keys, passwords or confidential source data in GitHub Pages.
-      N8N_STATUS_ENDPOINT: "",
-      POLL_INTERVAL_MS: 15000
+      N8N_STATUS_ENDPOINT: localStorage.getItem("dwhq_sentinel_status_endpoint") || "https://mrantidata.app.n8n.cloud/webhook/sentinel-worker-status",
+      POLL_INTERVAL_MS: 10000
     };
   </script>
   <script type="module">
@@ -1180,6 +1224,85 @@ function showToast(message){
   clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove("show"),2200);
 }
 
+const connectionModal=document.getElementById("connection-modal");
+const connectionInput=document.getElementById("status-endpoint-input");
+if(!localStorage.getItem("dwhq_sentinel_status_endpoint")){localStorage.setItem("dwhq_sentinel_status_endpoint","https://mrantidata.app.n8n.cloud/webhook/sentinel-worker-status");}
+const connectionTest=document.getElementById("connection-test");
+const n8nConnectionState=document.getElementById("n8n-connection-state");
+const systemLiveEl=document.querySelector(".system-live");
+
+function setConnectionUI(mode,message){
+  n8nConnectionState.className=mode;
+  systemLiveEl.classList.remove("live-connected","live-error");
+  if(mode==="connected"){
+    n8nConnectionState.innerHTML="CONNECTED <i></i>";
+    systemLiveEl.classList.add("live-connected");
+  }else if(mode==="error"){
+    n8nConnectionState.innerHTML="ERROR <i></i>";
+    systemLiveEl.classList.add("live-error");
+  }else{
+    n8nConnectionState.innerHTML="CONNECT <i></i>";
+  }
+  if(message)connectionTest.textContent=message;
+}
+function openConnectionModal(){
+  connectionInput.value=localStorage.getItem("dwhq_sentinel_status_endpoint")||"";
+  connectionTest.textContent="";
+  connectionTest.className="connection-test";
+  connectionModal.classList.add("open");
+  connectionModal.setAttribute("aria-hidden","false");
+  setTimeout(()=>connectionInput.focus(),50);
+}
+function closeConnectionModal(){
+  connectionModal.classList.remove("open");
+  connectionModal.setAttribute("aria-hidden","true");
+}
+async function testStatusEndpoint(endpoint){
+  const url=endpoint+(endpoint.includes("?")?"&":"?")+"_="+Date.now();
+  const res=await fetch(url,{method:"GET",headers:{"Accept":"application/json"},cache:"no-store"});
+  if(!res.ok)throw new Error(`HTTP ${res.status}`);
+  const payload=await res.json();
+  if(!payload||!Array.isArray(payload.workers))throw new Error("Unexpected response format");
+  return payload;
+}
+
+document.getElementById("connection-close").addEventListener("click",closeConnectionModal);
+connectionModal.addEventListener("click",e=>{if(e.target===connectionModal)closeConnectionModal()});
+document.getElementById("connection-clear").addEventListener("click",()=>{
+  localStorage.removeItem("dwhq_sentinel_status_endpoint");
+  window.DWHQ_CONFIG.N8N_STATUS_ENDPOINT="";
+  connectionInput.value="";
+  setConnectionUI("disconnected");
+  connectionTest.className="connection-test";
+  connectionTest.textContent="Connection removed from this browser.";
+});
+document.getElementById("connection-save").addEventListener("click",async()=>{
+  const endpoint=connectionInput.value.trim();
+  if(!endpoint){
+    connectionTest.className="connection-test bad";
+    connectionTest.textContent="Paste the Worker Status production URL.";
+    return;
+  }
+  connectionTest.className="connection-test";
+  connectionTest.textContent="Testing connection…";
+  try{
+    const payload=await testStatusEndpoint(endpoint);
+    localStorage.setItem("dwhq_sentinel_status_endpoint",endpoint);
+    window.DWHQ_CONFIG.N8N_STATUS_ENDPOINT=endpoint;
+    setConnectionUI("connected");
+    connectionTest.className="connection-test ok";
+    connectionTest.textContent="Connected. SENTINEL is now reading n8n telemetry.";
+    applyTelemetryPayload(payload);
+    setTimeout(closeConnectionModal,850);
+  }catch(err){
+    setConnectionUI("error");
+    connectionTest.className="connection-test bad";
+    connectionTest.textContent=`Could not connect: ${err.message}`;
+  }
+});
+systemLiveEl.addEventListener("click",openConnectionModal);
+n8nConnectionState.addEventListener("click",openConnectionModal);
+
 document.querySelector(".close-button")?.addEventListener("click",()=>{
   document.querySelector(".inspector")?.classList.remove("mobile-open");
 });
@@ -1223,32 +1346,42 @@ document.getElementById("view-3d").addEventListener("click",()=>{
 });
 
 // Safe telemetry hook.
-// Expected response: { workers: [{id:"sentinel", state:"working", progress:73, ...}], syncedAt:"21:46:13" }
-// Keep this endpoint read-only and return display-safe data only.
+// The public GET status endpoint returns display-safe data only.
+function applyTelemetryPayload(payload){
+  if(Array.isArray(payload?.workers)){
+    payload.workers.forEach(patch=>{
+      if(!patch.id||!workers.has(patch.id))return;
+      Object.assign(workers.get(patch.id),patch);
+      const label=labelEls.get(patch.id);
+      if(label){
+        const w=workers.get(patch.id);
+        label.className=`worker-label ${w.state}${patch.id===selectedId?" selected":""}`;
+        label.querySelector(".state").textContent=w.stateLabel||String(w.state).toUpperCase();
+      }
+    });
+    updateInspector(workers.get(selectedId));
+    setSelectedFloor(selectedId);
+    updateCounts();
+  }
+  if(payload?.syncedAt){
+    document.getElementById("last-sync").childNodes[0].nodeValue=payload.syncedAt+" ";
+  }
+}
+
 async function pollN8n(){
-  const endpoint=window.DWHQ_CONFIG?.N8N_STATUS_ENDPOINT;
-  if(!endpoint)return;
+  const endpoint=window.DWHQ_CONFIG?.N8N_STATUS_ENDPOINT ||
+    localStorage.getItem("dwhq_sentinel_status_endpoint") || "";
+  if(!endpoint){
+    setConnectionUI("disconnected");
+    return;
+  }
   try{
-    const res=await fetch(endpoint,{method:"GET",headers:{"Accept":"application/json"},cache:"no-store"});
-    if(!res.ok)throw new Error(`HTTP ${res.status}`);
-    const payload=await res.json();
-    if(Array.isArray(payload.workers)){
-      payload.workers.forEach(patch=>{
-        if(!patch.id||!workers.has(patch.id))return;
-        Object.assign(workers.get(patch.id),patch);
-        const label=labelEls.get(patch.id);
-        if(label){
-          const w=workers.get(patch.id);
-          label.className=`worker-label ${w.state}${patch.id===selectedId?" selected":""}`;
-          label.querySelector(".state").textContent=w.stateLabel||String(w.state).toUpperCase();
-        }
-      });
-      updateInspector(workers.get(selectedId));
-      updateCounts();
-    }
-    if(payload.syncedAt)document.getElementById("last-sync").textContent=payload.syncedAt+" ";
+    const payload=await testStatusEndpoint(endpoint);
+    applyTelemetryPayload(payload);
+    setConnectionUI("connected");
   }catch(err){
     console.warn("n8n telemetry unavailable:",err);
+    setConnectionUI("error");
   }
 }
 function updateCounts(){
@@ -1392,5 +1525,26 @@ function animate(){
 animate();
 
 </script>
+
+  <div class="connection-modal" id="connection-modal" aria-hidden="true">
+    <div class="connection-dialog" role="dialog" aria-modal="true" aria-labelledby="connection-title">
+      <div class="connection-dialog-head">
+        <div>
+          <span class="eyebrow">LIVE TELEMETRY</span>
+          <h2 id="connection-title">Connect n8n</h2>
+        </div>
+        <button type="button" id="connection-close" aria-label="Close">×</button>
+      </div>
+      <p>Paste the <strong>production GET URL</strong> from the <strong>Worker Status Webhook</strong>. This endpoint returns display-safe status only.</p>
+      <label for="status-endpoint-input">SENTINEL status URL</label>
+      <input id="status-endpoint-input" type="url" inputmode="url" autocomplete="off" placeholder="https://.../webhook/sentinel-worker-status">
+      <div class="connection-actions">
+        <button type="button" id="connection-clear" class="connection-secondary">CLEAR</button>
+        <button type="button" id="connection-save" class="connection-primary">CONNECT</button>
+      </div>
+      <div class="connection-test" id="connection-test" aria-live="polite"></div>
+    </div>
+  </div>
+
 </body>
 </html>
