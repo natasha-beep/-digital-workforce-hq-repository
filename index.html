@@ -1,0 +1,3130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f6f6fb" />
+  <title>VORA</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <style>
+*{box-sizing:border-box}
+:root{
+  --bg:#f6f6fb;
+  --panel:#fff;
+  --text:#17192a;
+  --muted:#777b8c;
+  --line:#e5e5ef;
+  --purple:#6259d9;
+  --purple-soft:#efedff;
+  --green:#2ebd74;
+  --green-soft:#eaf8f1;
+  --red:#e9545d;
+  --red-soft:#fff1f2;
+  --blue:#5b72da;
+  --shadow:0 18px 44px rgba(49,51,82,.09);
+}
+html,body{height:100%;margin:0;background:var(--bg);font-family:"Poppins",ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text)}
+button,a{font:inherit}
+button{cursor:pointer}
+.app-shell{height:100vh;min-height:720px;overflow:hidden;background:linear-gradient(135deg,#fbfbff 0%,#f5f4fb 60%,#f2f2f8 100%)}
+.topbar{height:68px;display:grid;grid-template-columns:280px 1fr 330px;align-items:center;padding:0 24px;border-bottom:1px solid rgba(214,214,226,.78);background:rgba(255,255,255,.87);backdrop-filter:blur(16px);position:relative;z-index:20}
+.brand{display:flex;align-items:center;gap:12px;font-weight:760;letter-spacing:.02em;font-size:13px}
+.brand-mark{width:28px;height:28px;position:relative;display:inline-block}
+.brand-mark:before{content:"";position:absolute;inset:6px;border:3px solid var(--purple);border-right-color:transparent;border-radius:50%}
+.brand-mark span{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--purple)}
+.brand-mark span:nth-child(1){left:1px;top:11px}.brand-mark span:nth-child(2){left:8px;top:1px}.brand-mark span:nth-child(3){right:2px;top:6px}.brand-mark span:nth-child(4){right:1px;bottom:4px}.brand-mark span:nth-child(5){left:6px;bottom:1px}
+.main-nav{display:flex;align-items:stretch;justify-content:center;height:100%;gap:30px}
+.nav-link{height:100%;display:flex;align-items:center;border:0;background:none;text-decoration:none;color:#6f7180;font-size:11px;font-weight:700;letter-spacing:.035em;position:relative;white-space:nowrap}
+.nav-link:hover{color:var(--text)}
+.nav-link.active{color:#282451}
+.nav-link.active:after{content:"";position:absolute;left:calc(50% - 12px);bottom:0;width:24px;height:3px;background:var(--purple);border-radius:3px 3px 0 0}
+.topbar-right{display:flex;align-items:center;justify-content:flex-end;gap:16px;font-size:11px}
+.system-live{display:flex;align-items:center;gap:8px;color:#595b68;font-weight:700;letter-spacing:.05em}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(46,189,116,.08)}
+.icon-button{width:38px;height:38px;border:0;border-left:1px solid var(--line);background:none;color:#545667;display:grid;place-items:center}
+.icon-button svg{width:18px;fill:none;stroke:currentColor;stroke-width:1.5}
+.profile-button{border:0;background:none;display:flex;gap:8px;align-items:center;font-weight:700;color:#242536}
+.profile-button svg{width:15px;fill:none;stroke:currentColor;stroke-width:1.6}
+
+.command-layout{height:calc(100vh - 68px);min-height:652px;display:grid;grid-template-columns:minmax(0,1fr) 316px;gap:16px;padding:12px 18px 18px 18px}
+.office-stage{position:relative;min-width:0;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 50% 40%,#ffffff 0%,#fbfbff 40%,#f2f2f8 100%);border:1px solid rgba(224,224,234,.8)}
+.stage-heading{position:absolute;z-index:8;top:18px;left:22px;pointer-events:none}
+.stage-heading h1{font-size:24px;line-height:1;margin:0 0 7px;font-weight:760;letter-spacing:-.035em}
+.stage-heading p{font-size:11px;color:var(--muted);margin:0 0 13px}
+.summary-line{display:flex;gap:20px;align-items:center;font-size:9px;font-weight:700;color:#6b6d7b;letter-spacing:.035em}
+.summary-line span{display:flex;align-items:center;gap:7px}
+.summary-line b{color:#4b4d5d;font-size:10px}
+.summary-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.summary-dot.working{background:var(--green)}.summary-dot.resting{background:#7587df}.summary-dot.attention{background:var(--red)}
+
+.view-toolbar{position:absolute;z-index:9;right:24px;top:12px;display:flex;gap:12px}
+.segmented,.zoom-control{height:38px;border:1px solid rgba(222,222,232,.9);border-radius:19px;background:rgba(255,255,255,.91);box-shadow:0 8px 22px rgba(49,51,82,.06);display:flex;align-items:center;padding:3px}
+.segmented button{width:48px;height:30px;border:0;border-radius:16px;background:transparent;color:#7d7f8e;font-size:11px;font-weight:700}
+.segmented button.selected{background:var(--purple);color:#fff;box-shadow:0 4px 12px rgba(98,89,217,.25)}
+.zoom-control button{width:32px;height:30px;border:0;background:transparent;color:#777987;font-size:19px}
+.zoom-control span{width:52px;text-align:center;font-size:11px;font-weight:750;color:#555766}
+
+.scene-wrap{position:absolute;inset:0;overflow:hidden}
+#scene-container{position:absolute;inset:0}
+#scene-container canvas{display:block;width:100%;height:100%;outline:none}
+#labels-layer{position:absolute;inset:0;pointer-events:none;z-index:5}
+.worker-label{position:absolute;transform:translate(-50%,-100%);min-width:154px;max-width:184px;background:rgba(255,255,255,.88);border:1px solid rgba(217,218,229,.88);border-radius:7px;padding:8px 10px;box-shadow:0 8px 25px rgba(47,50,81,.08);backdrop-filter:blur(8px);pointer-events:auto;cursor:pointer;transition:.18s ease}
+.worker-label:hover,.worker-label.selected{transform:translate(-50%,-100%) translateY(-3px);border-color:rgba(91,111,213,.5);box-shadow:0 10px 28px rgba(72,76,128,.13)}
+.worker-label.attention{background:rgba(255,247,248,.91);border-color:rgba(233,84,93,.26)}
+.worker-label .label-top{display:flex;align-items:flex-start;gap:7px}
+.worker-label .number{font-size:15px;font-weight:820;color:#30313e;line-height:1}
+.worker-label .dept{font-size:8px;font-weight:760;letter-spacing:.05em;color:#454757}
+.worker-label .name{font-size:10px;font-weight:800;margin-top:3px}
+.worker-label .state{font-size:8px;font-weight:800;margin-top:4px;color:var(--green);display:flex;align-items:center;gap:5px}
+.worker-label .state:before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.worker-label.attention .state{color:var(--red)}
+.worker-label.resting .state{color:#6879d9}
+
+.scene-fallback{position:absolute;inset:0;z-index:2;display:grid;place-items:center;color:#777a8b;font-size:12px;text-align:center}
+.scene-fallback>div{display:flex;flex-direction:column;gap:6px}
+.scene-fallback strong{color:#343646}
+.scene-fallback.loaded{display:none}
+
+.left-tools{position:absolute;z-index:8;left:18px;top:36%;display:flex;flex-direction:column;gap:6px}
+.left-tools button{width:53px;min-height:64px;border:1px solid rgba(224,224,234,.85);border-radius:14px;background:rgba(255,255,255,.9);box-shadow:0 10px 26px rgba(49,51,82,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#767989;font-size:8px}
+.left-tools svg{width:20px;height:20px;fill:none;stroke:#696b7d;stroke-width:1.6}
+.left-tools button:hover{border-color:#cac9e6;color:#3f4160}
+
+.scene-instructions{position:absolute;z-index:7;bottom:18px;left:50%;transform:translateX(-50%);text-align:center;color:#777989;pointer-events:none}
+.orbit-mark{font-size:25px;font-weight:750;color:#666979;letter-spacing:-.03em}
+.orbit-arc{width:182px;height:16px;border-top:1px dashed #8d8f9e;border-radius:50%;margin:1px auto -3px;position:relative}
+.orbit-arc:after{content:"";position:absolute;right:3px;top:-5px;border-left:7px solid #777987;border-top:4px solid transparent;border-bottom:4px solid transparent}
+.scene-instructions p{font-size:9px;margin:0}
+.scene-instructions p span{margin:0 9px}
+.deploy-worker{position:absolute;z-index:8;bottom:116px;left:50%;transform:translateX(-180px);border:1px solid #cfcfda;background:rgba(255,255,255,.87);border-radius:5px;padding:7px 10px;display:flex;gap:7px;align-items:center;color:#3d3e4e;font-size:8px;font-weight:750;box-shadow:0 8px 20px rgba(58,60,85,.06)}
+.deploy-worker>span:first-child{font-size:16px;font-weight:400}
+
+.toast{position:absolute;z-index:30;bottom:25px;right:22px;background:#292a3b;color:#fff;border-radius:10px;padding:10px 14px;font-size:11px;box-shadow:0 10px 28px rgba(34,35,55,.2);opacity:0;transform:translateY(8px);pointer-events:none;transition:.22s ease}
+.toast.show{opacity:1;transform:none}
+
+.inspector{min-width:0;background:rgba(255,255,255,.92);border:1px solid rgba(220,220,231,.9);border-radius:14px;box-shadow:var(--shadow);padding:16px 14px;overflow:auto;scrollbar-width:none}
+.inspector::-webkit-scrollbar{display:none}
+.inspector-header{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:750;color:#777987;letter-spacing:.04em;margin-bottom:15px}
+.close-button{border:0;background:none;font-size:22px;color:#999baa;line-height:1}
+.worker-identity{display:flex;gap:11px;align-items:center;margin-bottom:14px}
+.robot-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(145deg,#eef0f5,#d9dce4);position:relative;box-shadow:inset 0 0 0 1px #d1d3dc}
+.robot-avatar:before{content:"";position:absolute;width:34px;height:22px;border-radius:12px;left:8px;top:12px;background:#252936;border:5px solid #f4f5f8;box-sizing:border-box}
+.robot-avatar:after{content:"";position:absolute;width:28px;height:11px;left:11px;bottom:5px;border-radius:10px 10px 15px 15px;background:#f4f5f8;border:1px solid #d2d4dc}
+.avatar-eye{position:absolute;z-index:2;top:22px;width:4px;height:5px;border-radius:3px;background:#57e1d7;box-shadow:0 0 8px rgba(87,225,215,.7)}
+.avatar-eye.left{left:19px}.avatar-eye.right{right:19px}
+.worker-identity h2{font-size:18px;line-height:1.05;margin:0 0 3px;letter-spacing:-.035em}
+.worker-identity p{margin:0 0 7px;color:#777987;font-size:10px}
+.status-chip{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:800}
+.status-chip i{width:6px;height:6px;border-radius:50%;background:currentColor}
+.status-chip.working,.status-chip.active{color:var(--green)}
+.status-chip.attention{color:var(--red)}
+.status-chip.resting,.status-chip.scheduled{color:#6377d8}
+
+.detail-stack{border:1px solid #ebebf1;border-radius:9px;overflow:hidden;margin-bottom:12px}
+.detail-row{min-height:54px;padding:10px;display:flex;gap:10px;align-items:center}
+.detail-row+.detail-row{border-top:1px solid #ededf3}
+.detail-icon{color:#8f91a0;font-size:17px;width:19px;text-align:center}
+.detail-row div{display:flex;flex-direction:column;gap:4px}
+.detail-row label{font-size:8px;color:#999baa}
+.detail-row strong{font-size:10px;font-weight:700;color:#454657}
+
+.progress-card,.execution-card{padding:10px;border-top:1px solid #ededf2}
+.section-line{display:flex;justify-content:space-between;font-size:11px;font-weight:750;margin-bottom:7px}
+.progress-track{height:5px;border-radius:3px;background:#e9e9ef;overflow:hidden}
+.progress-track>div{height:100%;background:var(--green);border-radius:3px;transition:width .45s ease}
+.progress-metrics{display:grid;grid-template-columns:1.15fr 1.2fr .7fr;gap:10px;margin-top:12px}
+.progress-metrics div{display:flex;flex-direction:column;gap:3px}
+.progress-metrics strong{font-size:11px}
+.progress-metrics span{font-size:7px;color:#9294a1;line-height:1.15}
+
+.execution-card h3,.system-status h3{font-size:9px;color:#7d7f8e;letter-spacing:.04em;margin:0 0 10px}
+.execution-card dl,.system-status dl{margin:0}
+.execution-card dl div,.system-status dl div{display:flex;justify-content:space-between;align-items:center;min-height:25px}
+.execution-card dt,.system-status dt{font-size:8px;color:#999baa}
+.execution-card dd,.system-status dd{margin:0;font-size:9px;font-weight:750;color:#565867;display:flex;align-items:center;gap:5px}
+.tiny-live{width:5px;height:5px;border-radius:50%;background:var(--green)}
+.execution-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.button{height:30px;border-radius:5px;font-size:8px;font-weight:760;border:1px solid #cfcfe4}
+.button.secondary{background:#fff;color:#5751b8}.button.primary{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+.attention-card{background:linear-gradient(180deg,#fff5f6,#fff9f9);border:1px solid rgba(233,84,93,.28);border-radius:9px;padding:10px;margin-top:9px}
+.attention-title{font-size:8px;color:var(--red);font-weight:800;display:flex;gap:5px;align-items:center;margin-bottom:8px}
+.attention-card h3{margin:0 0 4px;font-size:13px}
+.attention-card>strong{display:block;color:var(--red);font-size:9px;margin-bottom:6px}
+.attention-meta{display:flex;justify-content:space-between;color:#777987;font-size:8px}
+.attention-card button{width:100%;height:27px;margin-top:9px;border:1px solid rgba(233,84,93,.55);background:rgba(255,255,255,.62);color:var(--red);border-radius:5px;font-size:8px;font-weight:800}
+
+.system-status{margin-top:10px;padding:10px;border-top:1px solid #ededf2}
+.system-status dl div{min-height:20px}
+.system-status dt{display:flex;align-items:center;gap:6px}
+.system-status dt i,.system-status dd i{width:5px;height:5px;border-radius:50%;background:var(--green)}
+.system-status dd{color:#3dbb73;font-size:8px}
+
+@media(max-width:1120px){
+  .topbar{grid-template-columns:220px 1fr 250px}
+  .main-nav{gap:15px}.nav-link{font-size:9px}
+  .command-layout{grid-template-columns:minmax(0,1fr) 286px}
+  .brand-name{font-size:11px}
+  .worker-label{min-width:132px}
+}
+@media(max-width:900px){
+  html,body{height:100%;overflow:hidden;-webkit-text-size-adjust:100%}
+  .app-shell{height:100svh;min-height:0;overflow:hidden}
+  .topbar{
+    height:54px;min-height:54px;
+    grid-template-columns:minmax(0,1fr) auto;
+    padding:0 12px;
+    position:relative;
+  }
+  .brand{gap:8px;font-size:10px;min-width:0}
+  .brand-mark{width:23px;height:23px;flex:0 0 23px}
+  .brand-name{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .main-nav{display:none}
+  .topbar-right{gap:8px}
+  .system-live{font-size:8px;letter-spacing:.03em}
+  .icon-button{display:none}
+  .profile-button{display:none}
+
+  .command-layout{
+    height:calc(100svh - 54px);
+    min-height:0;
+    display:block;
+    padding:6px;
+  }
+  .office-stage{
+    height:100%;
+    min-height:0;
+    border-radius:13px;
+    overflow:hidden;
+  }
+
+  .stage-heading{
+    top:12px;left:12px;right:12px;
+    max-width:calc(100% - 24px);
+  }
+  .stage-heading h1{
+    font-size:clamp(19px,5.5vw,23px);
+    line-height:1.05;
+    margin-bottom:5px;
+    max-width:55%;
+  }
+  .stage-heading p{
+    font-size:9px;
+    margin-bottom:8px;
+    max-width:72%;
+    white-space:normal;
+  }
+  .summary-line{
+    gap:10px 13px;
+    flex-wrap:wrap;
+    max-width:82%;
+    font-size:7px;
+    line-height:1.1;
+  }
+  .summary-line span{gap:5px}
+  .summary-line b{font-size:8px}
+  .summary-dot{width:5px;height:5px}
+
+  .view-toolbar{right:10px;top:9px;gap:6px}
+  .segmented,.zoom-control{height:31px;border-radius:16px;padding:2px}
+  .segmented button{width:36px;height:25px;font-size:9px}
+  .zoom-control{display:none}
+
+  .worker-label{
+    min-width:92px;max-width:116px;padding:5px 6px;
+    border-radius:6px;box-shadow:0 5px 14px rgba(47,50,81,.07);
+  }
+  .worker-label:hover,.worker-label.selected{transform:translate(-50%,-100%) translateY(-2px)}
+  .worker-label .label-top{gap:4px}
+  .worker-label .number{font-size:10px}
+  .worker-label .dept{display:none}
+  .worker-label .name{font-size:7px;margin-top:0;white-space:nowrap}
+  .worker-label .state{font-size:6px;margin-top:2px;gap:3px;white-space:nowrap}
+  .worker-label .state:before{width:4px;height:4px}
+
+  .left-tools{
+    top:auto;left:50%;bottom:54px;
+    transform:translateX(-50%);
+    flex-direction:row;gap:6px;
+  }
+  .left-tools button{width:42px;min-height:42px;height:42px;border-radius:12px;gap:0}
+  .left-tools svg{width:18px;height:18px}
+  .left-tools button span{display:none}
+
+  .scene-instructions{bottom:8px;width:100%}
+  .orbit-mark{font-size:15px}
+  .orbit-arc{width:110px;height:10px}
+  .scene-instructions p{font-size:6.5px}
+  .scene-instructions p span{margin:0 4px}
+  .deploy-worker{display:none}
+
+  .toast{bottom:105px;left:12px;right:12px;text-align:center;font-size:10px}
+
+  .inspector{
+    position:fixed;z-index:60;
+    left:8px;right:8px;bottom:8px;
+    max-height:min(68svh,620px);
+    margin:0;border-radius:18px;
+    padding:10px 12px 16px;
+    overflow:auto;
+    box-shadow:0 -14px 48px rgba(40,42,70,.16);
+    transform:translateY(calc(100% - 84px));
+    transition:transform .28s cubic-bezier(.2,.8,.2,1);
+    background:rgba(255,255,255,.97);
+    backdrop-filter:blur(18px);
+  }
+  .inspector.mobile-open{transform:translateY(0)}
+  .inspector:before{
+    content:"";display:block;width:38px;height:4px;border-radius:4px;
+    background:#d8d9e1;margin:0 auto 7px;
+  }
+  .inspector-header{margin:0 0 5px;height:13px;font-size:7px}
+  .close-button{font-size:18px}
+  .worker-identity{min-height:48px;margin-bottom:10px;gap:9px}
+  .robot-avatar{width:40px;height:40px;flex:0 0 40px}
+  .robot-avatar:before{width:28px;height:18px;left:6px;top:10px;border-width:4px}
+  .robot-avatar:after{width:23px;height:9px;left:8.5px;bottom:4px}
+  .avatar-eye{top:18px}
+  .avatar-eye.left{left:15px}.avatar-eye.right{right:15px}
+  .worker-identity h2{font-size:14px}
+  .worker-identity p{font-size:8px;margin-bottom:4px}
+  .status-chip{font-size:7px}
+  .detail-row{min-height:46px;padding:8px}
+  .detail-row label{font-size:7px}
+  .detail-row strong{font-size:9px}
+  .progress-card,.execution-card{padding:8px}
+  .progress-metrics{gap:5px;margin-top:9px}
+  .progress-metrics strong{font-size:9px}
+  .progress-metrics span{font-size:6px}
+  .attention-card{padding:8px}
+  .system-status{padding:8px}
+}
+
+@media(max-width:430px){
+  .stage-heading h1{max-width:52%}
+  .stage-heading p{max-width:80%}
+  .summary-line{max-width:92%}
+}
+
+
+/* ===== V3 VISUAL UPGRADE ===== */
+.office-stage:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 44%,rgba(255,255,255,0) 0 52%,rgba(92,88,150,.025) 80%,rgba(92,88,150,.055) 100%);
+  z-index:1;
+}
+.stage-heading,.view-toolbar,.left-tools,.scene-instructions,.deploy-worker,#labels-layer{z-index:8}
+.worker-label{
+  border-color:rgba(207,209,224,.86);
+  box-shadow:0 10px 26px rgba(54,58,92,.085);
+}
+.worker-label.selected{
+  border-color:rgba(98,89,217,.62);
+  box-shadow:0 12px 30px rgba(98,89,217,.15);
+}
+.worker-label.selected:after{
+  content:"";
+  position:absolute;
+  left:12px;right:12px;bottom:-1px;
+  height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--purple),transparent);
+}
+.inspector{
+  box-shadow:0 18px 55px rgba(45,49,80,.095);
+}
+.progress-track{height:6px}
+.progress-track>div{
+  background:linear-gradient(90deg,#47c991,#32b978);
+  box-shadow:0 0 12px rgba(46,189,116,.22);
+}
+.view-toolbar,.left-tools,.worker-label,.inspector{
+  -webkit-font-smoothing:antialiased;
+}
+
+@media(max-width:900px){
+  .zoom-control{display:none !important}
+  .stage-heading h1{max-width:46% !important}
+  .view-toolbar{right:8px !important;top:9px !important}
+  .segmented{height:30px !important}
+  .segmented button{width:34px !important;height:24px !important}
+  .worker-label{
+    min-width:74px !important;
+    max-width:94px !important;
+    padding:4px 5px !important;
+  }
+  .worker-label .number{font-size:8px !important}
+  .worker-label .name{font-size:6.3px !important;letter-spacing:-.01em}
+  .worker-label:not(.selected) .state{font-size:0 !important}
+  .worker-label:not(.selected) .state:before{width:5px;height:5px}
+  .worker-label.selected{min-width:94px !important;max-width:108px !important}
+  .worker-label.selected .state{font-size:5.6px !important}
+  .left-tools{
+    left:50% !important;
+    top:auto !important;
+    bottom:52px !important;
+    transform:translateX(-50%) !important;
+    flex-direction:row !important;
+  }
+  .left-tools button{
+    width:40px !important;height:40px !important;min-height:40px !important;
+  }
+  .left-tools button span{display:none !important}
+  .deploy-worker{display:none !important}
+  .scene-instructions{bottom:7px !important}
+  .orbit-mark{font-size:14px !important}
+  .inspector{
+    position:fixed !important;
+    left:7px !important;right:7px !important;bottom:7px !important;
+    margin:0 !important;
+    z-index:60 !important;
+    max-height:68svh !important;
+    transform:translateY(calc(100% - 82px)) !important;
+  }
+  .inspector.mobile-open{transform:translateY(0) !important}
+}
+
+
+/* ===== V4 LIVE n8n CONNECTION ===== */
+.system-live{cursor:pointer}
+.system-live.live-connected .live-dot{box-shadow:0 0 0 5px rgba(46,189,116,.11),0 0 14px rgba(46,189,116,.34)}
+.system-live.live-error .live-dot{background:var(--red);box-shadow:0 0 0 5px rgba(233,84,93,.08)}
+.connection-modal{
+  position:fixed;inset:0;z-index:200;
+  display:none;place-items:center;padding:20px;
+  background:rgba(31,32,48,.24);backdrop-filter:blur(10px)
+}
+.connection-modal.open{display:grid}
+.connection-dialog{
+  width:min(520px,100%);
+  border:1px solid rgba(218,218,229,.94);
+  border-radius:18px;background:rgba(255,255,255,.98);
+  box-shadow:0 24px 80px rgba(38,40,68,.20);padding:20px
+}
+.connection-dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.connection-dialog-head .eyebrow{font-size:8px;font-weight:800;letter-spacing:.08em;color:var(--purple)}
+.connection-dialog-head h2{margin:4px 0 0;font-size:24px;letter-spacing:-.035em}
+#connection-close{border:0;background:none;font-size:25px;color:#8c8e9d;line-height:1}
+.connection-dialog p{font-size:11px;line-height:1.55;color:#717482;margin:14px 0}
+.connection-dialog label{display:block;font-size:9px;font-weight:750;color:#565967;margin-bottom:7px}
+.connection-dialog input{
+  width:100%;height:44px;border:1px solid #dcdde7;border-radius:10px;
+  padding:0 12px;background:#fbfbfd;color:#252637;font-size:12px;outline:none
+}
+.connection-dialog input:focus{border-color:#8e87e5;box-shadow:0 0 0 3px rgba(98,89,217,.08)}
+.connection-actions{display:grid;grid-template-columns:110px 1fr;gap:9px;margin-top:12px}
+.connection-actions button{height:38px;border-radius:8px;font-size:9px;font-weight:800}
+.connection-secondary{border:1px solid #d8d8e5;background:#fff;color:#727484}
+.connection-primary{border:1px solid var(--purple);background:var(--purple);color:#fff}
+.connection-test{min-height:18px;margin-top:9px;font-size:9px;color:#777987}
+.connection-test.ok{color:var(--green)}.connection-test.bad{color:var(--red)}
+#n8n-connection-state{cursor:pointer}
+#n8n-connection-state.disconnected{color:#999baa}
+#n8n-connection-state.connected{color:#3dbb73}
+#n8n-connection-state.error{color:var(--red)}
+@media(max-width:900px){
+  .connection-modal{padding:10px;align-items:end}
+  .connection-dialog{border-radius:20px;padding:16px;margin-bottom:7px}
+  .connection-dialog-head h2{font-size:20px}
+  .connection-dialog p{font-size:10px}
+  .connection-actions{grid-template-columns:90px 1fr}
+}
+
+
+.brand-text small{display:none !important}
+.brand-text span{font-size:15px !important;letter-spacing:-.02em}
+
+
+.brand-mark{display:none !important}
+.brand-logo{
+  width:34px;
+  height:34px;
+  object-fit:contain;
+  display:block;
+  flex:0 0 34px;
+}
+@media(max-width:900px){
+  .brand-logo{
+    width:30px;
+    height:30px;
+    flex-basis:30px;
+  }
+}
+
+
+.deploy-worker{display:none !important}
+.deploy-worker-toolbar{
+  height:38px;
+  border:1px solid rgba(222,222,232,.9);
+  border-radius:19px;
+  background:rgba(255,255,255,.94);
+  box-shadow:0 8px 22px rgba(49,51,82,.06);
+  padding:0 14px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:#4f5060;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.02em;
+  white-space:nowrap;
+}
+.deploy-worker-toolbar:hover{
+  border-color:#c9c7e7;
+  color:#3c386f;
+}
+.deploy-worker-toolbar span:first-child{
+  font-size:16px;
+  line-height:1;
+  font-weight:400;
+}
+@media(max-width:900px){
+  .deploy-worker-toolbar{
+    display:none;
+  }
+}
+
+
+/* ===== V5 TRUE NORTH — OFFICE IS THE PRODUCT ===== */
+:root{
+  --purple:#6457ee;
+  --purple-deep:#5145db;
+  --purple-glow:rgba(100,87,238,.18);
+}
+.app-shell{
+  background:
+    radial-gradient(circle at 52% 46%,rgba(114,100,244,.055),transparent 34%),
+    linear-gradient(135deg,#fcfcff 0%,#f6f5ff 55%,#f2f1fb 100%);
+}
+.topbar{
+  height:64px;
+  grid-template-columns:250px 1fr 300px;
+  padding:0 20px;
+  background:rgba(255,255,255,.93);
+  border-bottom:1px solid rgba(215,214,232,.92);
+}
+.brand{gap:10px}
+.brand-logo{width:37px!important;height:37px!important;flex-basis:37px!important}
+.brand-name{font-size:17px!important;font-weight:700;letter-spacing:.11em!important;color:#21213b}
+.main-nav{gap:34px}
+.nav-link{font-size:10px;font-weight:500;text-transform:capitalize;letter-spacing:0}
+.nav-link.active{color:var(--purple);font-weight:600}
+.nav-link.active:after{
+  width:42px;left:calc(50% - 21px);height:2px;
+  background:linear-gradient(90deg,transparent,var(--purple),transparent)
+}
+.command-layout{
+  height:calc(100vh - 64px);
+  grid-template-columns:minmax(0,1fr) 330px;
+  gap:12px;
+  padding:10px 14px 12px;
+}
+.office-stage{
+  border-radius:15px;
+  border:1px solid rgba(220,219,235,.85);
+  background:
+    radial-gradient(circle at 50% 38%,rgba(255,255,255,.98) 0%,rgba(248,247,255,.96) 50%,rgba(241,240,250,.96) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+.stage-heading{top:24px;left:28px}
+.stage-heading h1{
+  font-size:14px;
+  text-transform:uppercase;
+  letter-spacing:.045em;
+  margin-bottom:14px;
+  font-weight:700;
+}
+.stage-heading p{display:none}
+.summary-line{
+  width:340px;
+  min-height:58px;
+  padding:10px 14px;
+  gap:0;
+  justify-content:space-between;
+  border:1px solid rgba(220,220,233,.9);
+  border-radius:10px;
+  background:rgba(255,255,255,.76);
+  box-shadow:0 10px 26px rgba(60,61,93,.045);
+  backdrop-filter:blur(10px);
+}
+.summary-line span{
+  display:grid;
+  grid-template-columns:10px 1fr;
+  grid-template-rows:auto auto;
+  column-gap:7px;
+  align-items:center;
+  min-width:82px;
+  font-size:7px;
+  letter-spacing:.02em;
+}
+.summary-line b{
+  grid-column:2;
+  grid-row:1;
+  font-size:13px;
+  font-weight:700;
+  color:#25263c;
+}
+
+.summary-dot{grid-column:1;grid-row:1 / span 2;width:7px;height:7px}
+.view-toolbar{right:26px;top:18px;gap:12px}
+.segmented,.zoom-control,.deploy-worker-toolbar{
+  height:36px;
+  border-radius:19px;
+  border:1px solid rgba(221,220,235,.92);
+  background:rgba(255,255,255,.9);
+  box-shadow:0 9px 24px rgba(55,57,88,.055)
+}
+.deploy-worker-toolbar{padding:0 17px;font-size:8px}
+.segmented button{width:42px;height:28px;font-size:9px}
+.segmented button.selected{
+  background:linear-gradient(145deg,#6f5ff8,#5749df);
+  box-shadow:0 5px 15px rgba(95,78,230,.25)
+}
+.zoom-control{position:absolute;right:50%;top:calc(100vh - 150px);transform:translateX(50%);z-index:9}
+.left-tools{left:18px;top:36%}
+.left-tools button{
+  width:48px;min-height:58px;border-radius:12px;
+  background:rgba(255,255,255,.9);
+}
+.scene-instructions{bottom:15px}
+.orbit-mark{font-size:23px}
+.worker-label{
+  min-width:150px;
+  padding:10px 12px 9px;
+  border-radius:8px;
+  background:rgba(255,255,255,.91);
+  border:1px solid rgba(209,208,229,.95);
+  box-shadow:0 10px 28px rgba(52,54,87,.10);
+}
+.worker-label:after{
+  content:"";
+  position:absolute;
+  bottom:-8px;left:50%;
+  transform:translateX(-50%);
+  border-left:7px solid transparent;
+  border-right:7px solid transparent;
+  border-top:8px solid rgba(100,87,238,.72);
+}
+.worker-label.attention:after{border-top-color:#ee6a72}
+.worker-label.resting:after{border-top-color:#697cdf}
+.worker-label .number{
+  width:24px;height:24px;
+  display:grid;place-items:center;
+  border-radius:5px;
+  background:#f0edff;
+  color:#5547df;
+  font-size:13px
+}
+.worker-label .dept{font-size:0}
+.worker-label .name{font-size:10px;margin-top:0}
+.worker-label .role{
+  font-size:7px;
+  font-weight:500;
+  color:#777a8c;
+  margin-top:3px;
+}
+.worker-label .state{font-size:7px;margin-top:5px}
+.inspector{
+  border-radius:15px;
+  padding:15px 14px;
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(219,218,233,.9);
+  box-shadow:0 18px 50px rgba(50,52,82,.08);
+}
+.inspector-header{margin-bottom:13px}
+.worker-identity h2{font-size:17px}
+.detail-stack,.progress-card,.execution-card,.attention-card{
+  border-radius:9px;
+}
+.execution-card h3{font-size:8px}
+.system-status{
+  margin-top:10px;
+  border:1px solid #ececf3;
+  border-radius:9px;
+  background:#fff;
+}
+.attention-card{
+  border-color:rgba(233,84,93,.26);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.8)
+}
+@media(min-width:901px){
+  .scene-instructions{bottom:16px}
+}
+@media(max-width:900px){
+  .brand-logo{width:31px!important;height:31px!important;flex-basis:31px!important}
+  .brand-name{font-size:13px!important}
+  .stage-heading h1{
+    font-size:15px;
+    max-width:58%!important;
+    letter-spacing:.01em;
+    text-transform:none;
+  }
+  .summary-line{
+    width:auto;
+    max-width:92%;
+    min-height:44px;
+    padding:7px 9px;
+  }
+  .summary-line span{min-width:67px}
+  .summary-line b{font-size:9px}
+  .summary-line span::after{font-size:5px}
+  .worker-label .role{display:none}
+}
+
+
+/* ===== V6 TRUE NORTH COMPOSITION ===== */
+.stage-heading h1{
+  font-size:14px!important;
+  text-transform:uppercase!important;
+  letter-spacing:.055em!important;
+  font-weight:700!important;
+  margin:0 0 12px!important;
+}
+.summary-line{
+  width:334px!important;
+  min-height:62px!important;
+  padding:10px 13px!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,1fr)!important;
+  gap:0!important;
+  background:rgba(255,255,255,.82)!important;
+  border:1px solid rgba(216,215,231,.95)!important;
+  border-radius:10px!important;
+  box-shadow:0 12px 28px rgba(67,62,110,.05)!important;
+}
+.summary-line span{
+  display:grid!important;
+  grid-template-columns:12px 1fr!important;
+  grid-template-rows:18px 14px!important;
+  align-items:center!important;
+  column-gap:6px!important;
+  min-width:0!important;
+  font-size:6.5px!important;
+  line-height:1.05!important;
+  color:#65677a!important;
+}
+.summary-line span+span{border-left:1px solid rgba(225,224,235,.9);padding-left:12px}
+.summary-line b{
+  grid-column:2!important;
+  grid-row:1!important;
+  font-size:13px!important;
+  line-height:1!important;
+  color:#222438!important;
+}
+.summary-dot{
+  grid-column:1!important;
+  grid-row:1/3!important;
+  width:7px!important;height:7px!important;
+}
+.office-stage{
+  background:
+    radial-gradient(circle at 50% 42%,rgba(255,255,255,1) 0%,rgba(249,248,255,.98) 54%,rgba(239,238,249,.98) 100%)!important;
+}
+.worker-label{
+  min-width:152px!important;
+  max-width:176px!important;
+  padding:9px 11px!important;
+  border-radius:8px!important;
+  background:rgba(255,255,255,.94)!important;
+  box-shadow:0 13px 32px rgba(62,55,104,.11)!important;
+}
+.worker-label .label-top{gap:8px!important}
+.worker-label .number{
+  width:25px!important;height:25px!important;
+  border-radius:5px!important;
+  background:#f1eeff!important;
+  font-size:13px!important;
+  flex:0 0 25px;
+}
+.worker-label .name{font-size:10px!important;font-weight:700!important}
+.worker-label .role{font-size:7px!important;color:#73758a!important;margin-top:2px!important}
+.worker-label .state{font-size:7px!important;margin-top:5px!important}
+.worker-label:after{bottom:-7px!important}
+.inspector{background:rgba(255,255,255,.96)!important}
+@media(max-width:900px){
+  .topbar{height:66px!important;min-height:66px!important}
+  .command-layout{height:calc(100svh - 66px)!important;padding:7px!important}
+  .office-stage{border-radius:15px!important}
+  .stage-heading{top:15px!important;left:14px!important;right:14px!important}
+  .stage-heading h1{
+    font-size:14px!important;
+    text-transform:uppercase!important;
+    letter-spacing:.035em!important;
+    max-width:58%!important;
+  }
+  .summary-line{
+    margin-top:0!important;
+    width:calc(100vw - 42px)!important;
+    max-width:none!important;
+    min-height:55px!important;
+    padding:8px 10px!important;
+  }
+  .summary-line span{
+    grid-template-columns:10px 1fr!important;
+    grid-template-rows:17px 13px!important;
+    font-size:5.6px!important;
+  }
+  .summary-line span+span{padding-left:8px!important}
+  .summary-line b{font-size:11px!important}
+  .view-toolbar{top:12px!important;right:10px!important}
+  .worker-label{
+    min-width:88px!important;
+    max-width:112px!important;
+    padding:6px 7px!important;
+    border-radius:7px!important;
+  }
+  .worker-label .number{
+    width:20px!important;height:20px!important;
+    flex-basis:20px!important;
+    font-size:10px!important;
+  }
+  .worker-label .name{font-size:7px!important}
+  .worker-label .role{display:none!important}
+  .worker-label .state{font-size:5.5px!important}
+  .worker-label .dept{display:none!important}
+  .left-tools{
+    left:50%!important;
+    bottom:56px!important;
+    top:auto!important;
+    transform:translateX(-50%)!important;
+    flex-direction:row!important;
+    opacity:.93;
+  }
+  .scene-instructions{display:none!important}
+}
+
+
+/* ===== V7 TRUE NORTH REBUILD ===== */
+.office-stage{
+  background:
+    radial-gradient(circle at 50% 44%,rgba(255,255,255,1) 0%,rgba(249,248,255,.98) 48%,rgba(241,240,250,.98) 100%);
+}
+#scene-container canvas{filter:saturate(1.06) contrast(1.015)}
+.stage-heading{top:22px;left:26px}
+.stage-heading h1{font-size:13px!important;letter-spacing:.055em!important}
+.summary-line{
+  width:330px!important;
+  background:rgba(255,255,255,.82)!important;
+  border-color:rgba(216,214,232,.95)!important;
+}
+.worker-label{
+  background:rgba(255,255,255,.94)!important;
+  border-color:rgba(197,194,231,.92)!important;
+}
+.worker-label .role{display:block}
+.worker-label.selected{box-shadow:0 12px 32px rgba(92,76,226,.16)!important}
+.inspector{background:rgba(255,255,255,.97)!important}
+
+@media(max-width:900px){
+  html,body{overflow:hidden!important}
+  .app-shell{height:100svh!important;overflow:hidden!important}
+  .command-layout{height:calc(100svh - 54px)!important;padding:6px!important}
+  .office-stage{height:100%!important;min-height:0!important}
+  .stage-heading{top:13px!important;left:13px!important;right:13px!important}
+  .stage-heading h1{
+    font-size:16px!important;
+    max-width:58%!important;
+    text-transform:uppercase!important;
+    letter-spacing:.035em!important;
+  }
+  .summary-line{
+    position:absolute!important;
+    top:47px!important;
+    left:0!important;
+    width:100%!important;
+    max-width:none!important;
+    height:54px!important;
+    min-height:54px!important;
+    padding:7px 10px!important;
+    border-radius:10px!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,1fr)!important;
+    gap:0!important;
+  }
+  .summary-line span{
+    min-width:0!important;
+    justify-content:center!important;
+    border-right:1px solid #deddea;
+    padding:0 7px!important;
+  }
+  .summary-line span:last-child{border-right:0}
+  .summary-line b{font-size:10px!important}
+  .summary-line span::after{font-size:5px!important}
+  .view-toolbar{right:11px!important;top:11px!important}
+  .worker-label{
+    min-width:96px!important;
+    max-width:126px!important;
+    padding:6px 7px!important;
+    border-radius:8px!important;
+  }
+  .worker-label .number{
+    width:23px!important;height:23px!important;
+    font-size:9px!important;
+  }
+  .worker-label .name{font-size:7px!important}
+  .worker-label .role{font-size:5.6px!important;white-space:nowrap}
+  .worker-label .state{font-size:5.5px!important}
+  .worker-label:not(.selected) .state{font-size:5.5px!important}
+  .worker-label:after{bottom:-6px!important;border-left-width:5px!important;border-right-width:5px!important;border-top-width:6px!important}
+  .left-tools{
+    bottom:88px!important;
+    opacity:.92;
+  }
+  .scene-instructions{display:none!important}
+  .inspector{
+    transform:translateY(calc(100% - 78px))!important;
+  }
+  .inspector.mobile-open{transform:translateY(0)!important}
+}
+
+
+/* ===== V8 MOBILE TRUE NORTH COMPOSITION ===== */
+@media(max-width:900px){
+
+  /* Keep the command surface clean and use the viewport efficiently */
+  .command-layout{
+    padding:6px!important;
+    gap:0!important;
+  }
+
+  .office-stage{
+    border-radius:13px!important;
+    overflow:hidden!important;
+  }
+
+  /* TRUE NORTH hierarchy: title + compact status + office immediately below */
+  .stage-heading{
+    top:12px!important;
+    left:14px!important;
+    right:14px!important;
+  }
+
+  .stage-heading h1{
+    font-size:15px!important;
+    line-height:1!important;
+    margin:0!important;
+    letter-spacing:.025em!important;
+  }
+
+  .summary-line{
+    top:44px!important;
+    height:48px!important;
+    min-height:48px!important;
+    padding:5px 8px!important;
+    border-radius:9px!important;
+    box-shadow:0 8px 20px rgba(55,57,88,.045)!important;
+  }
+
+  .summary-line span{
+    padding:0 5px!important;
+    grid-template-columns:8px 1fr!important;
+    column-gap:5px!important;
+  }
+
+  .summary-line b{
+    font-size:9px!important;
+  }
+
+  .summary-line span::after{
+    font-size:4.8px!important;
+    line-height:1.05!important;
+  }
+
+  .summary-dot{
+    width:6px!important;
+    height:6px!important;
+  }
+
+  /* 2D / 3D remains where it belongs */
+  .view-toolbar{
+    right:10px!important;
+    top:9px!important;
+  }
+
+  .segmented{
+    height:34px!important;
+  }
+
+  .segmented button{
+    width:41px!important;
+    height:27px!important;
+    font-size:9px!important;
+  }
+
+  /*
+   * Critical V8 fix:
+   * Move the entire rendered office + projected labels UP together.
+   * This removes the massive dead space visible in V7 while preserving
+   * raycasting / rotation behaviour.
+   */
+  #scene-container,
+  #labels-layer{
+    transform:translateY(-11.5vh)!important;
+    transform-origin:center center!important;
+  }
+
+  /* Labels should read as annotations, not UI cards covering the office */
+  .worker-label{
+    min-width:86px!important;
+    max-width:112px!important;
+    padding:5px 6px!important;
+    border-radius:7px!important;
+    box-shadow:0 7px 18px rgba(54,56,91,.08)!important;
+    backdrop-filter:blur(7px)!important;
+  }
+
+  .worker-label .label-top{
+    gap:5px!important;
+  }
+
+  .worker-label .number{
+    width:20px!important;
+    height:20px!important;
+    min-width:20px!important;
+    font-size:8px!important;
+    border-radius:5px!important;
+  }
+
+  .worker-label .name{
+    font-size:6.3px!important;
+    line-height:1.05!important;
+    white-space:nowrap!important;
+  }
+
+  .worker-label .role{
+    display:block!important;
+    font-size:4.6px!important;
+    line-height:1.05!important;
+    margin-top:2px!important;
+    max-width:75px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  .worker-label .state{
+    font-size:4.8px!important;
+    margin-top:3px!important;
+    gap:3px!important;
+  }
+
+  .worker-label .state:before{
+    width:4px!important;
+    height:4px!important;
+  }
+
+  .worker-label:after{
+    bottom:-5px!important;
+    border-left-width:4px!important;
+    border-right-width:4px!important;
+    border-top-width:5px!important;
+  }
+
+  /*
+   * Controls: remove the three giant floating tiles from the side.
+   * Present as a compact horizontal tool strip just above the inspector.
+   */
+  .left-tools{
+    position:absolute!important;
+    left:50%!important;
+    top:auto!important;
+    bottom:82px!important;
+    transform:translateX(-50%)!important;
+    flex-direction:row!important;
+    gap:7px!important;
+    z-index:10!important;
+  }
+
+  .left-tools button{
+    width:42px!important;
+    height:42px!important;
+    min-height:42px!important;
+    border-radius:12px!important;
+    padding:0!important;
+    gap:0!important;
+    background:rgba(255,255,255,.94)!important;
+    box-shadow:0 8px 20px rgba(48,50,82,.08)!important;
+  }
+
+  .left-tools button span{
+    display:none!important;
+  }
+
+  .left-tools svg{
+    width:18px!important;
+    height:18px!important;
+  }
+
+  /* The desktop orbit helper is unnecessary on mobile */
+  .scene-instructions{
+    display:none!important;
+  }
+
+  /*
+   * Bottom-sheet inspector:
+   * keep only a slim useful peek so the office remains the hero.
+   */
+  .inspector{
+    border-radius:18px 18px 0 0!important;
+    padding:12px 14px 16px!important;
+    transform:translateY(calc(100% - 76px))!important;
+    box-shadow:0 -12px 35px rgba(49,51,82,.10)!important;
+  }
+
+  .inspector:before{
+    top:7px!important;
+    width:50px!important;
+    height:4px!important;
+  }
+
+  .inspector.mobile-open{
+    transform:translateY(0)!important;
+  }
+
+  .inspector-header{
+    margin:12px 0 7px!important;
+    font-size:7px!important;
+  }
+
+  .worker-identity{
+    margin-bottom:10px!important;
+  }
+
+  .worker-identity h2{
+    font-size:15px!important;
+  }
+
+  .worker-identity p{
+    font-size:8px!important;
+  }
+
+  .robot-avatar{
+    width:42px!important;
+    height:42px!important;
+    min-width:42px!important;
+  }
+
+  /*
+   * Prevent the safari/browser bottom bar + inspector from creating
+   * a giant perceived empty lower region.
+   */
+  .scene-wrap{
+    bottom:0!important;
+  }
+}
+
+
+/* =================================================================
+   V10 TRUE NORTH CONVERGENCE
+   ================================================================= */
+:root{
+  --vora-purple:#6957ef;
+  --vora-purple-2:#7b68ff;
+  --vora-green:#26c77c;
+  --vora-red:#ef5964;
+  --vora-blue:#6880e7;
+}
+
+/* Entire command surface */
+.office-stage{
+  background:
+    radial-gradient(circle at 51% 44%,rgba(255,255,255,1) 0%,rgba(248,247,255,.995) 44%,rgba(239,238,249,.99) 100%)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    0 12px 34px rgba(69,62,120,.045)!important;
+}
+
+#scene-container canvas{
+  filter:saturate(1.11) contrast(1.025)!important;
+}
+
+/* True North: quiet UI, office dominates */
+.stage-heading h1{
+  font-weight:700!important;
+  letter-spacing:.035em!important;
+}
+.summary-line{
+  background:rgba(255,255,255,.90)!important;
+  border-color:rgba(207,205,228,.94)!important;
+  box-shadow:0 10px 30px rgba(48,49,82,.055)!important;
+  backdrop-filter:blur(16px)!important;
+}
+.view-toolbar .segmented,
+.view-toolbar .zoom-control,
+.deploy-worker-toolbar{
+  background:rgba(255,255,255,.92)!important;
+  backdrop-filter:blur(14px)!important;
+}
+
+/* Worker labels are annotations, not dominant cards */
+.worker-label{
+  background:rgba(255,255,255,.93)!important;
+  border-color:rgba(202,199,229,.94)!important;
+  box-shadow:0 9px 24px rgba(48,50,86,.09)!important;
+}
+.worker-label.selected{
+  border-color:rgba(104,86,239,.66)!important;
+  box-shadow:0 12px 30px rgba(97,78,230,.14)!important;
+}
+.worker-label.attention{
+  border-color:rgba(239,89,100,.38)!important;
+  background:rgba(255,249,249,.95)!important;
+}
+
+/* Desktop Inspector closer to True North */
+.inspector{
+  background:rgba(255,255,255,.965)!important;
+  border-color:rgba(214,212,230,.92)!important;
+  box-shadow:0 20px 60px rgba(54,54,88,.09)!important;
+}
+.attention-card{
+  background:linear-gradient(180deg,#fff4f5,#fffafa)!important;
+}
+
+/* Remove the old "360°" visual from the hero; controls communicate this already */
+.scene-instructions{
+  opacity:.70!important;
+}
+
+/* ---------------------- DESKTOP ---------------------- */
+@media(min-width:901px){
+  .command-layout{
+    grid-template-columns:minmax(0,1fr) 320px!important;
+    gap:10px!important;
+    padding:10px 12px 12px!important;
+  }
+
+  .stage-heading{
+    top:24px!important;
+    left:27px!important;
+  }
+  .stage-heading h1{
+    font-size:13px!important;
+    text-transform:uppercase!important;
+  }
+
+  .summary-line{
+    width:326px!important;
+    min-height:58px!important;
+  }
+
+  .view-toolbar{
+    top:18px!important;
+    right:22px!important;
+  }
+
+  .worker-label{
+    min-width:135px!important;
+    max-width:158px!important;
+    padding:8px 10px!important;
+  }
+  .worker-label .number{
+    width:25px!important;
+    height:25px!important;
+    font-size:12px!important;
+  }
+  .worker-label .name{font-size:8.5px!important}
+  .worker-label .role{font-size:6.3px!important}
+  .worker-label .state{font-size:6.3px!important}
+}
+
+/* ---------------------- MOBILE ---------------------- */
+@media(max-width:900px){
+  html,body,.app-shell{
+    height:100svh!important;
+    overflow:hidden!important;
+  }
+
+  .command-layout{
+    height:calc(100svh - 54px)!important;
+    padding:6px!important;
+    gap:0!important;
+  }
+
+  .office-stage{
+    height:100%!important;
+    min-height:0!important;
+    border-radius:13px!important;
+    overflow:hidden!important;
+  }
+
+  /* Compact header block */
+  .stage-heading{
+    top:11px!important;
+    left:13px!important;
+    right:13px!important;
+  }
+
+  .stage-heading h1{
+    font-size:14px!important;
+    line-height:1!important;
+    margin:0!important;
+    max-width:58%!important;
+    text-transform:uppercase!important;
+    letter-spacing:.025em!important;
+  }
+
+  .summary-line{
+    position:absolute!important;
+    top:42px!important;
+    left:0!important;
+    width:100%!important;
+    max-width:none!important;
+    height:47px!important;
+    min-height:47px!important;
+    padding:5px 7px!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,1fr)!important;
+    gap:0!important;
+    border-radius:9px!important;
+  }
+
+  .summary-line span{
+    min-width:0!important;
+    justify-content:center!important;
+    padding:0 4px!important;
+    border-right:1px solid #dddce9!important;
+    grid-template-columns:8px 1fr!important;
+    column-gap:5px!important;
+  }
+  .summary-line span:last-child{border-right:0!important}
+  .summary-line b{font-size:9px!important}
+  .summary-line span::after{font-size:4.6px!important}
+  .summary-dot{width:6px!important;height:6px!important}
+
+  .view-toolbar{
+    top:8px!important;
+    right:9px!important;
+  }
+  .segmented{height:34px!important}
+  .segmented button{
+    width:40px!important;
+    height:27px!important;
+    font-size:9px!important;
+  }
+
+  /* Compact projected annotations */
+  .worker-label{
+    min-width:80px!important;
+    max-width:106px!important;
+    padding:4px 5px!important;
+    border-radius:7px!important;
+  }
+  .worker-label .label-top{gap:5px!important}
+  .worker-label .number{
+    width:18px!important;height:18px!important;min-width:18px!important;
+    font-size:7px!important;
+  }
+  .worker-label .name{
+    font-size:5.8px!important;
+    line-height:1.05!important;
+    white-space:nowrap!important;
+  }
+  .worker-label .role{
+    display:block!important;
+    font-size:4.2px!important;
+    line-height:1.05!important;
+    margin-top:1px!important;
+    max-width:70px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  .worker-label .state{
+    font-size:4.4px!important;
+    margin-top:2px!important;
+    gap:3px!important;
+  }
+  .worker-label .state:before{
+    width:4px!important;height:4px!important;
+  }
+  .worker-label:after{
+    bottom:-5px!important;
+    border-left-width:4px!important;
+    border-right-width:4px!important;
+    border-top-width:5px!important;
+  }
+
+  /* Mobile control strip */
+  .left-tools{
+    position:absolute!important;
+    left:50%!important;
+    top:auto!important;
+    bottom:75px!important;
+    transform:translateX(-50%)!important;
+    flex-direction:row!important;
+    gap:6px!important;
+    z-index:10!important;
+  }
+  .left-tools button{
+    width:39px!important;
+    height:39px!important;
+    min-height:39px!important;
+    border-radius:11px!important;
+    padding:0!important;
+    gap:0!important;
+    background:rgba(255,255,255,.94)!important;
+    box-shadow:0 8px 20px rgba(48,50,82,.075)!important;
+  }
+  .left-tools button span{display:none!important}
+  .left-tools svg{width:18px!important;height:18px!important}
+
+  .scene-instructions{display:none!important}
+
+  /* Inspector: a slim, intentional bottom sheet */
+  .inspector{
+    border-radius:18px 18px 0 0!important;
+    padding:11px 13px 16px!important;
+    transform:translateY(calc(100% - 70px))!important;
+    box-shadow:0 -12px 35px rgba(49,51,82,.10)!important;
+  }
+  .inspector.mobile-open{transform:translateY(0)!important}
+  .inspector:before{
+    top:7px!important;
+    width:50px!important;
+    height:4px!important;
+  }
+  .inspector-header{
+    margin:11px 0 6px!important;
+    font-size:7px!important;
+  }
+  .worker-identity{margin-bottom:9px!important}
+  .worker-identity h2{font-size:15px!important}
+  .worker-identity p{font-size:8px!important}
+  .robot-avatar{
+    width:42px!important;height:42px!important;min-width:42px!important;
+  }
+
+  /* No CSS scene translation: camera handles framing properly. */
+  #scene-container,#labels-layer{
+    transform:none!important;
+  }
+}
+
+
+/* ===== V11 TRUE NORTH SCENE REBUILD ===== */
+.office-stage{background:radial-gradient(circle at 50% 43%,#fff 0%,#faf9ff 40%,#f2f0fb 100%)!important}
+#scene-container canvas{filter:saturate(1.14) contrast(1.04) brightness(.995)!important}
+.worker-label{backdrop-filter:blur(16px)!important}
+@media(min-width:901px){.worker-label{min-width:128px!important;max-width:150px!important}}
+@media(max-width:900px){
+ .worker-label{min-width:74px!important;max-width:98px!important;padding:4px 5px!important}
+ .worker-label .role{max-width:62px!important}
+ .summary-line{height:44px!important;min-height:44px!important}
+ .left-tools{bottom:71px!important}
+ .inspector{transform:translateY(calc(100% - 66px))!important}
+ .inspector.mobile-open{transform:translateY(0)!important}
+}
+
+
+/* ===== VORA COMMAND RC1 ===== */
+.office-stage{
+  background:radial-gradient(circle at 50% 39%,#fff 0%,#faf9ff 42%,#f1effa 100%)!important;
+}
+#scene-container canvas{filter:saturate(1.20) contrast(1.055) brightness(.985)!important}
+.worker-label{
+  background:rgba(255,255,255,.94)!important;
+  box-shadow:0 8px 22px rgba(48,49,84,.085)!important;
+}
+@media(max-width:900px){
+  .summary-line{top:41px!important;height:43px!important;min-height:43px!important}
+  #scene-container,#labels-layer{
+    transform:translateY(-4.2vh)!important;
+    transform-origin:center center!important;
+  }
+  .worker-label{min-width:72px!important;max-width:94px!important;padding:4px 5px!important}
+  .worker-label .number{width:17px!important;height:17px!important;min-width:17px!important;font-size:6.7px!important}
+  .worker-label .name{font-size:5.5px!important}
+  .worker-label .role{font-size:4px!important;max-width:60px!important}
+  .worker-label .state{font-size:4.2px!important}
+  .left-tools{bottom:68px!important}
+  .left-tools button{width:37px!important;height:37px!important;min-height:37px!important}
+  .inspector{transform:translateY(calc(100% - 64px))!important}
+  .inspector.mobile-open{transform:translateY(0)!important}
+}
+@media(min-width:901px){
+  .worker-label{min-width:126px!important;max-width:146px!important}
+}
+
+
+/* =====================================================================
+   VORA TRUE NORTH — FULL BIG BUILD
+   ===================================================================== */
+:root{
+  --vora-purple:#6757f0;
+  --vora-purple2:#806df9;
+  --vora-green:#2bc985;
+  --vora-red:#f05a66;
+  --vora-blue:#6684ed;
+  --vora-ink:#17182a;
+}
+
+.office-stage{
+  background:
+    radial-gradient(circle at 48% 43%,rgba(255,255,255,1) 0%,rgba(249,248,255,.995) 38%,rgba(239,237,249,.99) 100%)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.98),
+    0 18px 60px rgba(74,64,130,.055)!important;
+}
+
+#scene-container canvas{
+  filter:saturate(1.17) contrast(1.045) brightness(.99)!important;
+}
+
+/* The office is the product, UI should feel secondary. */
+.stage-heading h1{
+  font-weight:700!important;
+  letter-spacing:.045em!important;
+}
+
+.summary-line{
+  background:rgba(255,255,255,.91)!important;
+  backdrop-filter:blur(18px)!important;
+  border-color:rgba(208,206,229,.92)!important;
+  box-shadow:0 10px 30px rgba(54,55,91,.055)!important;
+}
+
+.worker-label{
+  background:rgba(255,255,255,.935)!important;
+  border-color:rgba(199,196,227,.94)!important;
+  box-shadow:0 9px 24px rgba(46,48,82,.09)!important;
+  backdrop-filter:blur(14px)!important;
+}
+
+.worker-label.selected{
+  border-color:rgba(103,87,240,.70)!important;
+  box-shadow:0 14px 34px rgba(98,80,229,.16)!important;
+}
+
+.inspector{
+  background:rgba(255,255,255,.97)!important;
+  border-color:rgba(211,209,229,.90)!important;
+  box-shadow:0 24px 70px rgba(54,55,90,.095)!important;
+}
+
+/* Desktop becomes a tighter, render-first layout. */
+@media(min-width:901px){
+  .command-layout{
+    grid-template-columns:minmax(0,1fr) 330px!important;
+    gap:11px!important;
+    padding:10px 12px 12px!important;
+  }
+
+  .stage-heading{
+    top:23px!important;
+    left:27px!important;
+  }
+
+  .stage-heading h1{
+    font-size:13px!important;
+    text-transform:uppercase!important;
+  }
+
+  .summary-line{
+    width:325px!important;
+    min-height:58px!important;
+  }
+
+  .view-toolbar{
+    top:18px!important;
+    right:23px!important;
+  }
+
+  .worker-label{
+    min-width:128px!important;
+    max-width:150px!important;
+    padding:8px 10px!important;
+  }
+
+  .worker-label .number{
+    width:25px!important;
+    height:25px!important;
+    font-size:12px!important;
+  }
+
+  .worker-label .name{font-size:8.5px!important}
+  .worker-label .role{font-size:6.2px!important}
+  .worker-label .state{font-size:6.2px!important}
+}
+
+/* Mobile is explicitly composed around the office, not around empty canvas. */
+@media(max-width:900px){
+  html,body,.app-shell{
+    height:100svh!important;
+    overflow:hidden!important;
+  }
+
+  .command-layout{
+    height:calc(100svh - 54px)!important;
+    padding:6px!important;
+    gap:0!important;
+  }
+
+  .office-stage{
+    height:100%!important;
+    min-height:0!important;
+    border-radius:13px!important;
+    overflow:hidden!important;
+  }
+
+  .stage-heading{
+    top:10px!important;
+    left:13px!important;
+    right:13px!important;
+  }
+
+  .stage-heading h1{
+    margin:0!important;
+    font-size:14px!important;
+    line-height:1!important;
+    max-width:58%!important;
+    text-transform:uppercase!important;
+    letter-spacing:.025em!important;
+  }
+
+  .summary-line{
+    position:absolute!important;
+    top:40px!important;
+    left:0!important;
+    width:100%!important;
+    max-width:none!important;
+    height:44px!important;
+    min-height:44px!important;
+    padding:5px 7px!important;
+    border-radius:9px!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,1fr)!important;
+    gap:0!important;
+  }
+
+  .summary-line span{
+    min-width:0!important;
+    padding:0 4px!important;
+    justify-content:center!important;
+    border-right:1px solid #dddce9!important;
+    grid-template-columns:8px 1fr!important;
+    column-gap:5px!important;
+  }
+  .summary-line span:last-child{border-right:0!important}
+  .summary-line b{font-size:9px!important}
+  .summary-line span::after{font-size:4.5px!important}
+  .summary-dot{width:6px!important;height:6px!important}
+
+  .view-toolbar{
+    top:7px!important;
+    right:8px!important;
+  }
+  .segmented{height:34px!important}
+  .segmented button{
+    width:40px!important;
+    height:27px!important;
+    font-size:9px!important;
+  }
+
+  .worker-label{
+    min-width:74px!important;
+    max-width:98px!important;
+    padding:4px 5px!important;
+    border-radius:7px!important;
+  }
+  .worker-label .label-top{gap:5px!important}
+  .worker-label .number{
+    width:17px!important;
+    height:17px!important;
+    min-width:17px!important;
+    font-size:6.7px!important;
+  }
+  .worker-label .name{
+    font-size:5.5px!important;
+    line-height:1.05!important;
+    white-space:nowrap!important;
+  }
+  .worker-label .role{
+    display:block!important;
+    font-size:4px!important;
+    line-height:1.05!important;
+    margin-top:1px!important;
+    max-width:60px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .worker-label .state{
+    font-size:4.2px!important;
+    margin-top:2px!important;
+  }
+
+  /* Small bottom tool strip — no giant floating buttons. */
+  .left-tools{
+    position:absolute!important;
+    left:50%!important;
+    top:auto!important;
+    bottom:68px!important;
+    transform:translateX(-50%)!important;
+    flex-direction:row!important;
+    gap:6px!important;
+    z-index:10!important;
+  }
+  .left-tools button{
+    width:37px!important;
+    height:37px!important;
+    min-height:37px!important;
+    padding:0!important;
+    gap:0!important;
+    border-radius:11px!important;
+    background:rgba(255,255,255,.94)!important;
+    box-shadow:0 8px 20px rgba(48,50,82,.075)!important;
+  }
+  .left-tools button span{display:none!important}
+  .left-tools svg{width:17px!important;height:17px!important}
+
+  .scene-instructions{display:none!important}
+
+  /* Inspector is only a slim peek until opened. */
+  .inspector{
+    border-radius:18px 18px 0 0!important;
+    padding:11px 13px 16px!important;
+    transform:translateY(calc(100% - 64px))!important;
+    box-shadow:0 -12px 35px rgba(49,51,82,.10)!important;
+  }
+  .inspector.mobile-open{transform:translateY(0)!important}
+
+  /* Camera owns framing. No CSS hacks to move the scene. */
+  #scene-container,#labels-layer{transform:none!important}
+}
+
+
+/* ============================================================
+   TRUE NORTH ASSET SCENE
+   ============================================================ */
+.office-stage{
+  background:
+    radial-gradient(circle at 50% 42%,#ffffff 0%,#faf9ff 42%,#f0eef9 100%)!important;
+}
+#scene-container canvas{
+  filter:saturate(1.13) contrast(1.035) brightness(.995)!important;
+}
+.asset-load-state{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:15;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 13px;
+  border:1px solid rgba(210,207,231,.88);
+  border-radius:999px;
+  background:rgba(255,255,255,.90);
+  backdrop-filter:blur(14px);
+  box-shadow:0 12px 30px rgba(65,56,120,.08);
+  font-size:8px;
+  font-weight:600;
+  letter-spacing:.04em;
+  color:#59576a;
+  pointer-events:none;
+  transition:opacity .35s ease;
+}
+.asset-load-state i{
+  width:7px;height:7px;border-radius:50%;
+  background:#6b5af2;
+  box-shadow:0 0 0 5px rgba(107,90,242,.10);
+  animation:assetPulse 1s ease-in-out infinite alternate;
+}
+.asset-load-state.done{opacity:0}
+@keyframes assetPulse{to{transform:scale(.65);opacity:.55}}
+
+@media(max-width:900px){
+  .asset-load-state{top:47%;font-size:7px}
+  .stage-heading h1{font-size:14px!important}
+  .summary-line{top:40px!important;height:44px!important;min-height:44px!important}
+  .worker-label{
+    min-width:72px!important;
+    max-width:96px!important;
+    padding:4px 5px!important;
+  }
+  .worker-label .number{width:17px!important;height:17px!important;min-width:17px!important}
+  .worker-label .name{font-size:5.5px!important}
+  .worker-label .role{font-size:4px!important;max-width:59px!important}
+  .worker-label .state{font-size:4.2px!important}
+  .inspector{transform:translateY(calc(100% - 64px))!important}
+  .inspector.mobile-open{transform:translateY(0)!important}
+  .left-tools{bottom:68px!important}
+  #scene-container,#labels-layer{transform:none!important}
+}
+
+</style>
+
+  <meta name="application-name" content="VORA">
+  <meta name="apple-mobile-web-app-title" content="VORA">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="./favicon-64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./vora-home-v2-180.png">
+  <link rel="manifest" href="./site-v2.webmanifest">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand" aria-label="VORA">
+        <img class="brand-logo" src="./vora-logo.png" alt="" aria-hidden="true">
+        <span class="brand-name">VORA</span>
+      </div>
+
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a class="nav-link active" href="./index.html">COMMAND</a>
+        <button class="nav-link" type="button" data-coming-soon="Workforce">WORKFORCE</button>
+        <button class="nav-link" type="button" data-coming-soon="Activity">ACTIVITY</button>
+        <button class="nav-link" type="button" data-coming-soon="Incidents">INCIDENTS</button>
+        <button class="nav-link" type="button" data-coming-soon="Mission Control">MISSION CONTROL</button>
+        <button class="nav-link" type="button" data-coming-soon="Impact">IMPACT</button>
+      </nav>
+
+      <div class="topbar-right">
+        <div class="system-live"><span class="live-dot"></span>SYSTEM LIVE</div>
+        <button class="icon-button bell" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+        </button>
+        <button class="profile-button" type="button">
+          <span>Tasha Syafiq</span>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="command-layout">
+      <section class="office-stage" aria-label="Live Digital Office">
+        <div class="stage-heading">
+          <h1>Live Digital Office</h1>
+          <p>Your digital workforce is operating in real time.</p>
+          <div class="summary-line" aria-label="Workforce status summary">
+            <span><i class="summary-dot working"></i><b id="count-working">3</b> WORKING</span>
+            <span><i class="summary-dot resting"></i><b id="count-resting">1</b> RESTING</span>
+            <span><i class="summary-dot attention"></i><b id="count-attention">1</b> NEEDS ATTENTION</span>
+          </div>
+        </div>
+
+        <div class="view-toolbar">
+          <button class="deploy-worker-toolbar" type="button" id="deploy-worker">
+            <span>＋</span>
+            <span>DEPLOY WORKER</span>
+          </button>
+          <div class="segmented" aria-label="View mode">
+            <button type="button" id="view-2d">2D</button>
+            <button type="button" id="view-3d" class="selected">3D</button>
+          </div>
+          <div class="zoom-control" aria-label="Zoom">
+            <button type="button" id="zoom-out" aria-label="Zoom out">−</button>
+            <span id="zoom-value">100%</span>
+            <button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+
+        <div class="scene-wrap" id="scene-wrap">
+          <div id="scene-container" aria-label="Interactive 3D office"></div>
+          <div id="labels-layer" aria-hidden="true"></div>
+
+          <div class="scene-fallback" id="scene-fallback">
+            <div>
+              <strong>Loading the live 3D office…</strong>
+              <span>If this remains visible, check your internet connection. The prototype loads Three.js from a public CDN.</span>
+            </div>
+          </div>
+
+          <div class="left-tools" aria-label="3D office controls">
+            <button type="button" id="rotate-view" title="Rotate office">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 2 6M4 10V5m0 5h5"/></svg>
+              <span>Rotate</span>
+            </button>
+            <button type="button" id="reset-view" title="Reset view">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2 5M20 11V6m0 5h-5"/></svg>
+              <span>Reset<br>View</span>
+            </button>
+            <button type="button" id="fit-office" title="Fit office">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M8 21H3v-5m13 5h5v-5"/></svg>
+              <span>Fit Office</span>
+            </button>
+          </div>
+
+          <div class="scene-instructions">
+            <div class="orbit-mark">360°</div>
+            <div class="orbit-arc"></div>
+            <p>Drag to rotate <span>·</span> Scroll to zoom <span>·</span> Click a worker</p>
+          </div>
+
+
+        </div>
+
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      </section>
+
+      <aside class="inspector" aria-label="Worker Inspector">
+        <div class="inspector-header">
+          <span>WORKER INSPECTOR</span>
+          <button type="button" class="close-button" aria-label="Close inspector">×</button>
+        </div>
+
+        <div class="worker-identity">
+          <div class="robot-avatar" id="inspector-avatar">
+            <span class="avatar-eye left"></span>
+            <span class="avatar-eye right"></span>
+          </div>
+          <div>
+            <h2 id="worker-name">SENTINEL / 001</h2>
+            <p id="worker-role">Cost Intelligence Officer</p>
+            <div class="status-chip working" id="worker-status"><i></i>WORKING</div>
+          </div>
+        </div>
+
+        <div class="detail-stack">
+          <div class="detail-row">
+            <span class="detail-icon">▧</span>
+            <div>
+              <label>Current assignment</label>
+              <strong id="worker-assignment">PSS1 Cost of Sales</strong>
+            </div>
+          </div>
+          <div class="detail-row">
+            <span class="detail-icon">⌕</span>
+            <div>
+              <label>Current process</label>
+              <strong id="worker-process">Checking missing unit costs</strong>
+            </div>
+          </div>
+        </div>
+
+        <section class="progress-card">
+          <div class="section-line">
+            <span>Progress</span>
+            <strong id="progress-label">72%</strong>
+          </div>
+          <div class="progress-track"><div id="progress-bar" style="width:72%"></div></div>
+          <div class="progress-metrics">
+            <div><strong id="metric-primary">41 / 57</strong><span id="metric-primary-label">Products processed</span></div>
+            <div><strong id="metric-secondary">1</strong><span id="metric-secondary-label">Barcode under investigation</span></div>
+            <div><strong id="metric-elapsed">03:17</strong><span>Elapsed</span></div>
+          </div>
+        </section>
+
+        <section class="execution-card">
+          <h3>LIVE EXECUTION</h3>
+          <dl>
+            <div><dt>Execution #</dt><dd id="exec-id">2841</dd></div>
+            <div><dt>Node</dt><dd id="exec-node">06 / 09</dd></div>
+            <div><dt>Heartbeat</dt><dd><i class="tiny-live"></i><span id="exec-heartbeat">2 sec ago</span></dd></div>
+            <div><dt>Last check-in</dt><dd id="exec-checkin">21:46:13</dd></div>
+          </dl>
+          <div class="execution-actions">
+            <button type="button" class="button secondary" id="view-execution">VIEW EXECUTION</button>
+            <button type="button" class="button primary" id="open-n8n">OPEN n8n ↗</button>
+          </div>
+        </section>
+
+        <section class="attention-card" id="attention-card">
+          <div class="attention-title">⚙ <span>ATTENTION</span></div>
+          <h3>UTIL-01</h3>
+          <strong>Authentication failure</strong>
+          <div class="attention-meta">
+            <span>myTNB · Login → Submit</span>
+            <span>21:43:07</span>
+          </div>
+          <button type="button" id="investigate">INVESTIGATE INCIDENT →</button>
+        </section>
+
+        <section class="system-status">
+          <h3>SYSTEM STATUS</h3>
+          <dl>
+            <div><dt><i></i>LAST SYNC</dt><dd id="last-sync">21:46:13 <i></i></dd></div>
+            <div><dt><i></i>n8n</dt><dd id="n8n-connection-state" class="disconnected">CONNECT <i></i></dd></div>
+            <div><dt><i></i>GitHub</dt><dd>CONNECTED <i></i></dd></div>
+            <div><dt><i></i>WATCHTOWER HEARTBEAT</dt><dd>OK <i></i></dd></div>
+          </dl>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    window.DWHQ_CONFIG = {
+      N8N_STATUS_ENDPOINT: localStorage.getItem("dwhq_sentinel_status_endpoint") || "https://mrantidata.app.n8n.cloud/webhook/sentinel-worker-status",
+      POLL_INTERVAL_MS: 10000
+    };
+  </script>
+  <script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.185.1/+esm";
+import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/controls/OrbitControls.js/+esm";
+import { RoundedBoxGeometry } from "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/geometries/RoundedBoxGeometry.js/+esm";
+import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/loaders/GLTFLoader.js/+esm";
+import { clone as cloneSkeleton } from "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/utils/SkeletonUtils.js/+esm";
+
+const workerSeed = [
+  {
+    id:"sentinel", code:"001", name:"SENTINEL", department:"COST INTELLIGENCE", role:"Cost Intelligence Officer",
+    state:"working", stateLabel:"WORKING", assignment:"PSS1 Cost of Sales", process:"Checking missing unit costs",
+    progress:72, primary:"41 / 57", primaryLabel:"Products processed", secondary:"1", secondaryLabel:"Barcode under investigation",
+    elapsed:"03:17", execution:"2841", node:"06 / 09", heartbeat:"2 sec ago", checkin:"21:46:13",
+    room:{x:-2.65,z:-2.35,w:4.55,d:3.20}, color:0x53cfc4
+  },
+  {
+    id:"util", code:"002", name:"UTIL-01", department:"UTILITIES", role:"Utility Data Collector",
+    state:"attention", stateLabel:"ATTENTION", assignment:"Utility collection", process:"Authenticating to myTNB",
+    progress:31, primary:"Login", primaryLabel:"Current step", secondary:"3", secondaryLabel:"Attempts",
+    elapsed:"00:41", execution:"2838", node:"04 / 08", heartbeat:"41 sec ago", checkin:"21:43:07",
+    room:{x:2.70,z:-2.20,w:3.55,d:3.05}, color:0xe66970
+  },
+  {
+    id:"dataqa", code:"003", name:"DATA-QA", department:"DATA QUALITY", role:"Data Quality Officer",
+    state:"working", stateLabel:"WORKING", assignment:"Monthly dataset", process:"Validating monthly dataset",
+    progress:43, primary:"1,204 / 2,801", primaryLabel:"Records validated", secondary:"17", secondaryLabel:"Flagged records",
+    elapsed:"05:22", execution:"2840", node:"05 / 11", heartbeat:"4 sec ago", checkin:"21:46:11",
+    room:{x:-3.45,z:1.55,w:3.60,d:3.20}, color:0x57bd7a
+  },
+  {
+    id:"reporter", code:"004", name:"REPORTER", department:"MANAGEMENT REPORTING", role:"Management Reporting Officer",
+    state:"resting", stateLabel:"SCHEDULED / RESTING", assignment:"Management report", process:"Next shift 1 Sep · 08:00",
+    progress:0, primary:"1 SEP", primaryLabel:"Next shift", secondary:"08:00", secondaryLabel:"Scheduled time",
+    elapsed:"—", execution:"—", node:"—", heartbeat:"standby", checkin:"20:02:18",
+    room:{x:2.45,z:2.45,w:3.80,d:3.10}, color:0x6d84dc
+  },
+  {
+    id:"watchtower", code:"005", name:"WATCHTOWER", department:"AUTOMATION SUPERVISION", role:"Automation Supervisor",
+    state:"active", stateLabel:"ACTIVE", assignment:"Workforce supervision", process:"Monitoring heartbeats and failures",
+    progress:100, primary:"5 / 5", primaryLabel:"Workers observed", secondary:"1", secondaryLabel:"Open incident",
+    elapsed:"LIVE", execution:"2839", node:"09 / 09", heartbeat:"1 sec ago", checkin:"21:46:14",
+    room:{x:-.10,z:.55,w:3.25,d:2.65}, color:0x8c79e8
+  }
+];
+
+const workers = new Map(workerSeed.map(w => [w.id, structuredClone(w)]));
+let selectedId = "sentinel";
+
+const sceneContainer = document.getElementById("scene-container");
+const labelsLayer = document.getElementById("labels-layer");
+const fallback = document.getElementById("scene-fallback");
+const toast = document.getElementById("toast");
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xf7f7fb);
+scene.fog = new THREE.Fog(0xf7f7fb, 28, 52);
+
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false, powerPreference:"high-performance"});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.02;
+sceneContainer.appendChild(renderer.domElement);
+fallback.classList.add("loaded");
+
+const camera = new THREE.OrthographicCamera(-10,10,8,-8,0.1,100);
+const startPosition = new THREE.Vector3(10.35,7.45,11.10);
+camera.position.copy(startPosition);
+camera.zoom = window.innerWidth<=900 ? 1.26 : 1.24;
+camera.userData.manualZoom=false;
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(-.08,.80,.35);
+controls.enableDamping = true;
+controls.dampingFactor = .07;
+controls.minZoom = window.innerWidth<=900 ? .98 : .72;
+controls.maxZoom = window.innerWidth<=900 ? 1.85 : 2.3;
+controls.enablePan = false;
+controls.minPolarAngle = THREE.MathUtils.degToRad(34);
+controls.maxPolarAngle = THREE.MathUtils.degToRad(70);
+controls.update();
+
+const hemi = new THREE.HemisphereLight(0xffffff,0xd4cfeb,1.95);
+scene.add(hemi);
+const keyLight = new THREE.DirectionalLight(0xffffff,2.85);
+keyLight.position.set(-8,18,12);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048,2048);
+keyLight.shadow.camera.left = -18;
+keyLight.shadow.camera.right = 18;
+keyLight.shadow.camera.top = 18;
+keyLight.shadow.camera.bottom = -18;
+scene.add(keyLight);
+const fill = new THREE.DirectionalLight(0xbdb8ff,1.60);
+fill.position.set(12,8,-8);
+scene.add(fill);
+const warmFill = new THREE.DirectionalLight(0xfff1df,.7);
+warmFill.position.set(-4,7,-10);
+scene.add(warmFill);
+const topSoft = new THREE.PointLight(0xffffff,1.1,42,2);
+topSoft.position.set(0,13,1);
+scene.add(topSoft);
+
+const colors = {
+  floor:0xf0efed, floor2:0xe9e8e8, wall:0xfafafa, glass:0xcbd5df, oak:0xc9ad8b,
+  desk:0xe8e4df, graphite:0x434955, screen:0x16333a, screenBlue:0x28466f, chair:0xc8c9cf, plant:0x7f9c77
+};
+const materials = {
+  floor:new THREE.MeshStandardMaterial({color:colors.floor,roughness:.88,metalness:0}),
+  floor2:new THREE.MeshStandardMaterial({color:colors.floor2,roughness:.9}),
+  wall:new THREE.MeshStandardMaterial({color:0xefeff5,roughness:.30,metalness:.04}),
+  glass:new THREE.MeshPhysicalMaterial({color:0xc7cef0,transparent:true,opacity:.50,roughness:.045,metalness:0,transmission:.24,clearcoat:.88,clearcoatRoughness:.06}),
+  oak:new THREE.MeshStandardMaterial({color:colors.oak,roughness:.74}),
+  desk:new THREE.MeshStandardMaterial({color:colors.desk,roughness:.7}),
+  graphite:new THREE.MeshStandardMaterial({color:colors.graphite,roughness:.55}),
+  robotWhite:new THREE.MeshStandardMaterial({color:0xf3f5f7,roughness:.36,metalness:.08}),
+  robotDark:new THREE.MeshStandardMaterial({color:0x28313b,roughness:.34,metalness:.18}),
+  green:new THREE.MeshStandardMaterial({color:0x4cc78b,roughness:.5,emissive:0x153f2b,emissiveIntensity:.2}),
+  red:new THREE.MeshStandardMaterial({color:0xe75c65,roughness:.5,emissive:0x501417,emissiveIntensity:.25}),
+  blue:new THREE.MeshStandardMaterial({color:0x6d84dc,roughness:.5,emissive:0x1d285e,emissiveIntensity:.16})
+};
+
+function mesh(geometry, material, x=0,y=0,z=0, cast=true, receive=true){
+  const m = new THREE.Mesh(geometry, material);
+  m.position.set(x,y,z);
+  m.castShadow = cast;
+  m.receiveShadow = receive;
+  return m;
+}
+
+const office = new THREE.Group();
+scene.add(office);
+
+const roomObjects=new Map();
+const robotObjects=new Map();
+const animatedItems=[];
+const robotMixers=[];
+const assetRobotState=new Map();
+
+const floorY=.33;
+
+// -------------------- ASSET SOURCES --------------------
+const KENNEY="https://cdn.jsdelivr.net/gh/ETdoFresh/kenney.nl@master/furniturekit_updated/Models/GLTF%20format/";
+const ASSET_URL={
+  desk:KENNEY+"desk.glb",
+  deskCorner:KENNEY+"deskCorner.glb",
+  chair:KENNEY+"chairDesk.glb",
+  chairModern:KENNEY+"chairModernFrameCushion.glb",
+  screen:KENNEY+"computerScreen.glb",
+  keyboard:KENNEY+"computerKeyboard.glb",
+  mouse:KENNEY+"computerMouse.glb",
+  laptop:KENNEY+"laptop.glb",
+  bookcase:KENNEY+"bookcaseOpen.glb",
+  bookcaseLow:KENNEY+"bookcaseOpenLow.glb",
+  cabinet:KENNEY+"sideTableDrawers.glb",
+  plant:KENNEY+"pottedPlant.glb",
+  plantSmall:KENNEY+"plantSmall2.glb",
+  lamp:KENNEY+"lampSquareFloor.glb",
+  rugRound:KENNEY+"rugRound.glb",
+  rugRounded:KENNEY+"rugRounded.glb",
+  sofa:KENNEY+"loungeDesignSofa.glb",
+  loungeChair:KENNEY+"loungeDesignChair.glb",
+  coffeeTable:KENNEY+"tableCoffeeGlass.glb",
+  robot:"https://cdn.jsdelivr.net/gh/danvanderboom/Aetherium@main/samples/unity/Aphelion/Assets/ThirdParty/Quaternius/custodian-animated-robot.glb"
+};
+
+const gltfLoader=new GLTFLoader();
+const gltfCache=new Map();
+
+function loadGLTF(key){
+  if(gltfCache.has(key))return gltfCache.get(key);
+  const primary=ASSET_URL[key];
+  const fallbackUrl=primary
+    .replace("https://cdn.jsdelivr.net/gh/ETdoFresh/kenney.nl@master/","https://raw.githubusercontent.com/ETdoFresh/kenney.nl/master/")
+    .replace("https://cdn.jsdelivr.net/gh/danvanderboom/Aetherium@main/","https://raw.githubusercontent.com/danvanderboom/Aetherium/main/");
+  const promise=new Promise((resolve,reject)=>{
+    gltfLoader.load(primary,resolve,undefined,()=>{
+      gltfLoader.load(fallbackUrl,resolve,undefined,reject);
+    });
+  });
+  gltfCache.set(key,promise);
+  return promise;
+}
+
+function setWorkerIdDeep(root,id){
+  root.traverse(o=>{o.userData.workerId=id});
+}
+
+function tintAsset(root,accent=null,mode="furniture"){
+  root.traverse(o=>{
+    if(!o.isMesh)return;
+    o.castShadow=true;
+    o.receiveShadow=true;
+    if(!o.material)return;
+    o.material=o.material.clone();
+    if("roughness" in o.material)o.material.roughness=Math.min(.62,Math.max(.28,o.material.roughness??.42));
+    if("metalness" in o.material)o.material.metalness=Math.min(.15,o.material.metalness??.03);
+
+    if(mode==="robot" && o.material.color){
+      const c=o.material.color;
+      const l=(c.r+c.g+c.b)/3;
+      const sat=Math.max(c.r,c.g,c.b)-Math.min(c.r,c.g,c.b);
+      if(l>.60){
+        c.setHex(0xf7f8fb);
+      }else if(l<.24){
+        c.setHex(0x252b37);
+      }else if(sat>.18 && accent){
+        c.lerp(new THREE.Color(accent),.68);
+      }else{
+        c.lerp(new THREE.Color(0xd8dbe4),.35);
+      }
+    }
+  });
+}
+
+function normalizedAsset(gltf,targetMax=1){
+  const root=cloneSkeleton(gltf.scene);
+  const box=new THREE.Box3().setFromObject(root);
+  const size=new THREE.Vector3();
+  box.getSize(size);
+  const max=Math.max(size.x,size.y,size.z)||1;
+  const scale=targetMax/max;
+  root.scale.setScalar(scale);
+  root.updateMatrixWorld(true);
+
+  const scaledBox=new THREE.Box3().setFromObject(root);
+  const center=new THREE.Vector3();
+  scaledBox.getCenter(center);
+  root.position.x-=center.x;
+  root.position.z-=center.z;
+  root.position.y-=scaledBox.min.y;
+  root.updateMatrixWorld(true);
+  return root;
+}
+
+async function placeAsset(key,{x=0,y=floorY,z=0,rot=0,size=1,accent=null,workerId=null,mode="furniture"}={}){
+  const gltf=await loadGLTF(key);
+  const root=normalizedAsset(gltf,size);
+  tintAsset(root,accent,mode);
+  const wrapper=new THREE.Group();
+  wrapper.add(root);
+  wrapper.position.set(x,y,z);
+  wrapper.rotation.y=rot;
+  if(workerId)setWorkerIdDeep(wrapper,workerId);
+  office.add(wrapper);
+  return {wrapper,gltf,model:root};
+}
+
+function roundedMesh(w,h,d,radius,material,x=0,y=0,z=0){
+  const geo=new RoundedBoxGeometry(w,h,d,5,Math.min(radius,Math.min(w,h,d)/2));
+  const m=mesh(geo,material,x,y,z);
+  return m;
+}
+
+function addRoomFloor(x,z,w,d,color,elevation=0){
+  const mat=new THREE.MeshStandardMaterial({
+    color:0xf1f0f5,
+    roughness:.38,
+    metalness:.018,
+    emissive:color,
+    emissiveIntensity:.024
+  });
+  const floor=roundedMesh(w,.20,d,.18,mat,x,floorY+elevation,z);
+  office.add(floor);
+  return floor;
+}
+
+function addShellWall(x,y,z,w,h,d,mat){
+  const q=roundedMesh(w,h,d,.055,mat,x,y,z);
+  office.add(q);
+  return q;
+}
+
+const wallMat=new THREE.MeshStandardMaterial({color:0xf3f3f8,roughness:.31,metalness:.02});
+const frameMat=new THREE.MeshStandardMaterial({color:0xd6d7e2,roughness:.27,metalness:.08});
+const glassMat=new THREE.MeshPhysicalMaterial({
+  color:0xd9ddf4,transparent:true,opacity:.32,roughness:.045,
+  transmission:.42,clearcoat:.75,clearcoatRoughness:.08,depthWrite:false
+});
+const whiteMat=new THREE.MeshStandardMaterial({color:0xf8f8fb,roughness:.36});
+const darkMat=new THREE.MeshStandardMaterial({color:0x343947,roughness:.34,metalness:.06});
+
+function addGlassPanel(x,y,z,w,h,d,rot=0){
+  const g=roundedMesh(w,h,d,.025,glassMat,x,y,z);
+  g.rotation.y=rot;
+  office.add(g);
+  return g;
+}
+
+function addFloorGlow(x,z,w,d,color,elevation=0,opacity=.58){
+  const mat=new THREE.MeshBasicMaterial({color,transparent:true,opacity,depthWrite:false});
+  const y=floorY+elevation+.12,t=.026;
+  [
+    mesh(new THREE.BoxGeometry(w,t,t),mat,x,y,z-d/2,false,false),
+    mesh(new THREE.BoxGeometry(w,t,t),mat,x,y,z+d/2,false,false),
+    mesh(new THREE.BoxGeometry(t,t,d),mat,x-w/2,y,z,false,false),
+    mesh(new THREE.BoxGeometry(t,t,d),mat,x+w/2,y,z,false,false)
+  ].forEach(o=>office.add(o));
+}
+
+
+function dashboardTexture(accent="#7565f4",variant=0,label="VORA"){
+  const c=document.createElement("canvas");
+  c.width=768;c.height=432;
+  const ctx=c.getContext("2d");
+
+  const bg=ctx.createLinearGradient(0,0,768,432);
+  bg.addColorStop(0,"#101523");
+  bg.addColorStop(1,"#1b2035");
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,768,432);
+
+  ctx.strokeStyle="rgba(255,255,255,.055)";
+  ctx.lineWidth=1;
+  for(let x=34;x<768;x+=62){ctx.beginPath();ctx.moveTo(x,35);ctx.lineTo(x,400);ctx.stroke()}
+  for(let y=72;y<410;y+=52){ctx.beginPath();ctx.moveTo(28,y);ctx.lineTo(740,y);ctx.stroke()}
+
+  ctx.fillStyle=accent;
+  ctx.fillRect(30,28,132,7);
+
+  ctx.font="600 20px Poppins, Arial";
+  ctx.fillStyle="#f2f4ff";
+  ctx.fillText(label,30,62);
+
+  const vals=[.35,.62,.47,.79,.58,.88,.67,.94,.72,.84,.55,.76];
+  vals.forEach((v,i)=>{
+    const h=138*v;
+    ctx.fillStyle=i%3===variant%3?accent:"rgba(124,151,204,.46)";
+    ctx.fillRect(34+i*27,325-h,15,h);
+  });
+
+  ctx.beginPath();
+  for(let i=0;i<14;i++){
+    const x=400+i*23;
+    const y=245-Math.sin((i+variant)*.68)*49-(i%4)*7;
+    i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+  }
+  ctx.strokeStyle=accent;
+  ctx.lineWidth=4;
+  ctx.shadowColor=accent;
+  ctx.shadowBlur=12;
+  ctx.stroke();
+  ctx.shadowBlur=0;
+
+  ctx.fillStyle="rgba(255,255,255,.70)";
+  ctx.font="500 13px Poppins, Arial";
+  ctx.fillText("LIVE OPERATIONS",400,68);
+  ctx.fillText("PROCESS",400,100);
+
+  ctx.fillStyle="rgba(255,255,255,.14)";
+  ctx.fillRect(400,116,250,8);
+  ctx.fillStyle=accent;
+  ctx.fillRect(400,116,[184,132,106,222][variant%4],8);
+
+  ctx.font="700 34px Poppins, Arial";
+  ctx.fillStyle="#ffffff";
+  ctx.fillText(["72%","ATTENTION","43%","LIVE"][variant%4],400,172);
+
+  ctx.font="500 12px Poppins, Arial";
+  ctx.fillStyle="rgba(255,255,255,.58)";
+  ctx.fillText("REAL-TIME TELEMETRY",400,202);
+
+  const tex=new THREE.CanvasTexture(c);
+  tex.colorSpace=THREE.SRGBColorSpace;
+  tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+  return tex;
+}
+
+function addWallDashboard(x,y,z,rot,w,h,accent,label,variant=0){
+  const tex=dashboardTexture("#"+new THREE.Color(accent).getHexString(),variant,label);
+  const frame=roundedMesh(w+.10,h+.10,.07,.055,darkMat,x,y,z);
+  frame.rotation.y=rot;office.add(frame);
+
+  const sm=new THREE.MeshStandardMaterial({
+    map:tex,emissive:new THREE.Color(accent),emissiveIntensity:.10,
+    roughness:.16,metalness:.02
+  });
+  const screen=roundedMesh(w,h,.018,.035,sm,x,y,z-.045);
+  screen.rotation.y=rot;office.add(screen);
+  animatedItems.push({kind:"screenPulse",obj:screen,phase:Math.random()*6});
+  return screen;
+}
+
+function addAccentRing(x,z,r,color,elevation=0,opacity=.42){
+  const mat=new THREE.MeshBasicMaterial({color,transparent:true,opacity,side:THREE.DoubleSide});
+  const ring=new THREE.Mesh(new THREE.RingGeometry(r,r+.055,64),mat);
+  ring.rotation.x=-Math.PI/2;
+  ring.position.set(x,floorY+elevation+.13,z);
+  office.add(ring);
+  animatedItems.push({kind:"ring",obj:ring,phase:Math.random()});
+  return ring;
+}
+
+// -------------------- BASE ARCHITECTURE --------------------
+const ground=mesh(
+  new THREE.PlaneGeometry(42,34),
+  new THREE.MeshStandardMaterial({color:0xf7f7fb,roughness:1}),
+  0,-.19,0,false,true
+);
+ground.rotation.x=-Math.PI/2;
+scene.add(ground);
+
+const baseMat=new THREE.MeshStandardMaterial({color:0xeeeef3,roughness:.42,metalness:.015});
+office.add(roundedMesh(13.7,.60,10.8,.95,baseMat,0,0,.40));
+office.add(roundedMesh(13.15,.12,10.25,.84,whiteMat,0,.34,.40));
+
+const perimeterGlow=new THREE.MeshBasicMaterial({color:0xa899ff,transparent:true,opacity:.22});
+[
+  [0,.405,-4.62,12.25,.025,.025],
+  [0,.405,5.42,12.25,.025,.025],
+  [-6.10,.405,.40,.025,.025,9.95],
+  [6.10,.405,.40,.025,.025,9.95]
+].forEach(([x,y,z,w,h,d])=>office.add(mesh(new THREE.BoxGeometry(w,h,d),perimeterGlow,x,y,z,false,false)));
+
+const ROOM={
+  sentinel:{x:-2.55,z:-2.20,w:4.40,d:3.18,e:.28,color:0x7664f5},
+  util:{x:2.65,z:-2.10,w:3.50,d:3.12,e:.04,color:0xf05f69},
+  dataqa:{x:-3.35,z:1.58,w:3.55,d:3.15,e:.02,color:0x48cc8c},
+  reporter:{x:2.45,z:2.45,w:3.75,d:3.08,e:.02,color:0x6684ea},
+  watchtower:{x:-.05,z:.58,w:3.30,d:2.72,e:.08,color:0x7868f1}
+};
+
+function buildRoomShell(id){
+  const r=ROOM[id];
+  const y=floorY+r.e;
+  const floor=addRoomFloor(r.x,r.z,r.w,r.d,r.color,r.e);
+
+  // Rear solid wall + partial solid side, front kept open as a cutaway.
+  addShellWall(r.x,y+1.02,r.z-r.d/2+.075,r.w,1.82,.15,wallMat);
+  addShellWall(r.x-r.w/2+.075,y+1.02,r.z,.15,1.82,r.d,wallMat);
+
+  // Framed glass front/right.
+  addGlassPanel(r.x+r.w/2-.055,y+.84,r.z,.10,1.42,r.d*.82);
+  addGlassPanel(r.x-r.w*.28,y+.70,r.z+r.d/2-.05,r.w*.40,1.18,.09);
+  addGlassPanel(r.x+r.w*.31,y+.70,r.z+r.d/2-.05,r.w*.28,1.18,.09);
+
+  // Structural posts.
+  [
+    [r.x-r.w/2+.08,r.z-r.d/2+.08],
+    [r.x+r.w/2-.08,r.z-r.d/2+.08],
+    [r.x-r.w/2+.08,r.z+r.d/2-.08],
+    [r.x+r.w/2-.08,r.z+r.d/2-.08]
+  ].forEach(([px,pz])=>office.add(roundedMesh(.095,1.88,.095,.025,frameMat,px,y+.98,pz)));
+
+  addFloorGlow(r.x,r.z,r.w-.08,r.d-.08,r.color,r.e,id==="util"?.78:.56);
+
+  const glowMat=new THREE.MeshStandardMaterial({
+    color:r.color,transparent:true,opacity:.075,
+    emissive:r.color,emissiveIntensity:.22,roughness:.32
+  });
+  office.add(roundedMesh(Math.min(r.w*.68,2.7),.025,Math.min(r.d*.56,1.90),.28,glowMat,r.x,y+.13,r.z+.10));
+
+  const roomLight=new THREE.PointLight(r.color,id==="util"?1.65:1.25,5.3,2);
+  roomLight.position.set(r.x,y+1.55,r.z-.10);
+  office.add(roomLight);
+
+  roomObjects.set(id,{floor,baseEmissive:.024,border:[],glowRail:[]});
+}
+
+// Create all five room shells.
+["sentinel","util","dataqa","watchtower","reporter"].forEach(buildRoomShell);
+
+// WATCHTOWER circular center platform.
+{
+  const r=ROOM.watchtower;
+  const mat=new THREE.MeshStandardMaterial({
+    color:0xe7e6ef,roughness:.32,metalness:.02,
+    emissive:r.color,emissiveIntensity:.055
+  });
+  const p=new THREE.Mesh(new THREE.CylinderGeometry(1.30,1.40,.16,64),mat);
+  p.position.set(r.x,floorY+r.e+.16,r.z+.10);
+  office.add(p);
+  addAccentRing(r.x,r.z+.10,.92,r.color,r.e,.50);
+  const greenRing=new THREE.Mesh(
+    new THREE.RingGeometry(1.10,1.145,64),
+    new THREE.MeshBasicMaterial({color:0x5fd7b1,transparent:true,opacity:.25,side:THREE.DoubleSide})
+  );
+  greenRing.rotation.x=-Math.PI/2;
+  greenRing.position.set(r.x,floorY+r.e+.25,r.z+.10);
+  office.add(greenRing);
+  animatedItems.push({kind:"ringReverse",obj:greenRing,phase:0});
+}
+
+// Main wall dashboards — visually rich screens like True North.
+addWallDashboard(ROOM.sentinel.x,2.10+ROOM.sentinel.e,ROOM.sentinel.z-ROOM.sentinel.d/2+.13,0,2.70,.82,ROOM.sentinel.color,"SENTINEL",0);
+addWallDashboard(ROOM.util.x,2.02+ROOM.util.e,ROOM.util.z-ROOM.util.d/2+.13,0,2.30,.80,ROOM.util.color,"UTIL-01",1);
+addWallDashboard(ROOM.dataqa.x-ROOM.dataqa.w/2+.13,1.92,ROOM.dataqa.z-.05,Math.PI/2,2.03,.78,ROOM.dataqa.color,"DATA-QA",2);
+addWallDashboard(ROOM.watchtower.x,1.92,ROOM.watchtower.z-ROOM.watchtower.d/2+.13,0,2.18,.70,ROOM.watchtower.color,"WATCHTOWER",3);
+addWallDashboard(ROOM.reporter.x,1.92,ROOM.reporter.z-ROOM.reporter.d/2+.13,0,2.35,.76,ROOM.reporter.color,"REPORTER",0);
+
+// -------------------- ASSET OFFICE --------------------
+async function addDeskStation(id,config){
+  const r=ROOM[id];
+  const y=floorY+r.e+.12;
+  const accent=r.color;
+  const worker=workers.get(id);
+
+  const deskKey=config.corner?"deskCorner":"desk";
+  const desk=await placeAsset(deskKey,{
+    x:config.deskX,y,z:config.deskZ,rot:config.deskRot||0,
+    size:config.deskSize||2.0,accent
+  });
+
+  const chair=await placeAsset(config.chairModern?"chairModern":"chair",{
+    x:config.robotX,y,z:config.robotZ,rot:config.robotRot||Math.PI,
+    size:.92,accent
+  });
+
+  // Physical monitor frames — actual GLB assets.
+  const count=config.screens||3;
+  const spacing=config.screenSpacing||.56;
+  for(let i=0;i<count;i++){
+    const n=i-(count-1)/2;
+    const angle=(config.screenCurve??.13)*n;
+    const cos=Math.cos(config.deskRot||0),sin=Math.sin(config.deskRot||0);
+    const localX=n*spacing;
+    const localZ=-.53-Math.abs(n)*.015;
+    const sx=config.deskX + localX*cos - localZ*sin;
+    const sz=config.deskZ + localX*sin + localZ*cos;
+    await placeAsset("screen",{
+      x:sx,y:y+.72,z:sz,
+      rot:(config.deskRot||0)+angle,
+      size:.60,accent
+    });
+  }
+
+  // Keyboard + mouse for realism.
+  {
+    const rot=config.deskRot||0;
+    const cos=Math.cos(rot),sin=Math.sin(rot);
+    const kx=config.deskX + 0*cos - (-.10)*sin;
+    const kz=config.deskZ + 0*sin + (-.10)*cos;
+    await placeAsset("keyboard",{x:kx,y:y+.70,z:kz,rot,size:.43,accent});
+    await placeAsset("mouse",{x:kx+.30*cos,y:y+.70,z:kz+.30*sin,rot,size:.15,accent});
+  }
+
+  // Robot: actual animated GLB, recoloured into VORA white/dark/accent palette.
+  try{
+    const robotGLTF=await loadGLTF("robot");
+    const robotRoot=normalizedAsset(robotGLTF,config.robotSize||1.02);
+    tintAsset(robotRoot,accent,"robot");
+
+    const wrapper=new THREE.Group();
+    wrapper.add(robotRoot);
+    wrapper.position.set(config.robotX,y,config.robotZ);
+    wrapper.rotation.y=config.robotRot||Math.PI;
+    setWorkerIdDeep(wrapper,id);
+    wrapper.userData.assetRobot=true;
+    wrapper.userData.baseY=y;
+    wrapper.userData.baseRot=config.robotRot||Math.PI;
+    office.add(wrapper);
+    robotObjects.set(id,wrapper);
+    assetRobotState.set(id,{root:wrapper,model:robotRoot,baseY:y,baseRot:wrapper.rotation.y});
+
+    if(robotGLTF.animations?.length){
+      const mixer=new THREE.AnimationMixer(robotRoot);
+      const preferred=
+        robotGLTF.animations.find(a=>/idle|work|typing|interact/i.test(a.name)) ||
+        robotGLTF.animations[0];
+      if(preferred){
+        const action=mixer.clipAction(preferred);
+        action.play();
+        robotMixers.push(mixer);
+      }
+    }
+  }catch(err){
+    console.warn("Robot GLB unavailable, using station click target:",err);
+    robotObjects.set(id,chair.wrapper);
+    setWorkerIdDeep(chair.wrapper,id);
+  }
+
+  // Decorative office assets.
+  for(const item of config.props||[]){
+    await placeAsset(item.key,{
+      x:item.x,y:y+(item.dy||0),z:item.z,rot:item.rot||0,
+      size:item.size,accent
+    });
+  }
+}
+
+async function buildAssetOffice(){
+  const status=document.createElement("div");
+  status.className="asset-load-state";
+  status.innerHTML="<i></i><span>BUILDING LIVE OFFICE</span>";
+  sceneContainer.appendChild(status);
+
+  try{
+    // Warm cache for most-used assets.
+    await Promise.all([
+      "robot","desk","deskCorner","chair","chairModern","screen",
+      "keyboard","mouse","plant","bookcase","cabinet"
+    ].map(k=>loadGLTF(k).catch(()=>null)));
+
+    await Promise.all([
+      addDeskStation("sentinel",{
+        deskX:-2.55,deskZ:-2.45,deskRot:0,corner:true,deskSize:2.22,
+        robotX:-2.55,robotZ:-1.72,robotRot:Math.PI,robotSize:1.04,
+        screens:4,screenSpacing:.57,screenCurve:.15,chairModern:true,
+        props:[
+          {key:"bookcase",x:-.95,z:-2.85,rot:Math.PI/2,size:1.20},
+          {key:"cabinet",x:-.98,z:-1.65,rot:Math.PI/2,size:.78},
+          {key:"plant",x:-4.12,z:-3.15,size:.70},
+          {key:"lamp",x:-1.10,z:-3.05,size:.72},
+          {key:"rugRounded",x:-2.55,z:-1.92,size:2.20}
+        ]
+      }),
+      addDeskStation("util",{
+        deskX:2.70,deskZ:-2.40,deskRot:0,deskSize:1.98,
+        robotX:2.70,robotZ:-1.69,robotRot:Math.PI,robotSize:1.02,
+        screens:3,screenSpacing:.55,screenCurve:.14,chairModern:true,
+        props:[
+          {key:"cabinet",x:1.38,z:-1.55,rot:Math.PI/2,size:.82},
+          {key:"plant",x:4.05,z:-3.06,size:.66},
+          {key:"lamp",x:1.46,z:-2.94,size:.70},
+          {key:"rugRounded",x:2.70,z:-1.92,size:1.95}
+        ]
+      }),
+      addDeskStation("dataqa",{
+        deskX:-3.58,deskZ:1.65,deskRot:Math.PI/2,deskSize:1.82,
+        robotX:-2.90,robotZ:1.65,robotRot:-Math.PI/2,robotSize:.99,
+        screens:2,screenSpacing:.54,screenCurve:.08,
+        props:[
+          {key:"bookcase",x:-2.10,z:.62,rot:0,size:1.13},
+          {key:"laptop",x:-3.54,z:1.38,rot:Math.PI/2,size:.48},
+          {key:"plant",x:-4.67,z:.45,size:.68},
+          {key:"rugRounded",x:-2.96,z:1.65,size:1.90}
+        ]
+      }),
+      addDeskStation("watchtower",{
+        deskX:-.05,deskZ:.32,deskRot:0,corner:true,deskSize:2.28,
+        robotX:-.05,robotZ:1.02,robotRot:Math.PI,robotSize:1.03,
+        screens:5,screenSpacing:.50,screenCurve:.17,chairModern:true,
+        props:[
+          {key:"cabinet",x:-1.24,z:1.36,size:.72},
+          {key:"cabinet",x:1.14,z:1.36,size:.72},
+          {key:"rugRound",x:-.05,z:.95,size:2.10}
+        ]
+      }),
+      addDeskStation("reporter",{
+        deskX:2.48,deskZ:2.20,deskRot:0,deskSize:2.08,
+        robotX:2.48,robotZ:2.93,robotRot:Math.PI,robotSize:1.00,
+        screens:3,screenSpacing:.55,screenCurve:.13,chairModern:true,
+        props:[
+          {key:"bookcaseLow",x:1.03,z:3.13,rot:Math.PI/2,size:.90},
+          {key:"cabinet",x:3.88,z:3.10,rot:Math.PI/2,size:.76},
+          {key:"plant",x:3.90,z:1.08,size:.68},
+          {key:"rugRounded",x:2.48,z:2.82,size:1.92}
+        ]
+      })
+    ]);
+
+    // Reception / lobby — real GLB furniture.
+    await Promise.all([
+      placeAsset("sofa",{x:-1.65,y:floorY+.14,z:4.55,rot:0,size:1.85}),
+      placeAsset("loungeChair",{x:.10,y:floorY+.14,z:4.55,rot:.15,size:.92}),
+      placeAsset("coffeeTable",{x:-.72,y:floorY+.14,z:4.82,size:.84}),
+      placeAsset("plant",{x:-2.72,y:floorY+.14,z:4.56,size:.76}),
+      placeAsset("plant",{x:.74,y:floorY+.14,z:4.52,size:.70})
+    ]);
+
+    status.classList.add("done");
+    setTimeout(()=>status.remove(),500);
+  }catch(err){
+    console.error("Asset office build failed:",err);
+    status.querySelector("span").textContent="OFFICE ASSETS RETRYING";
+  }
+}
+
+// Reception architecture + VORA brand monument.
+{
+  const lobbyMat=new THREE.MeshStandardMaterial({color:0xf2f0f5,roughness:.37});
+  office.add(roundedMesh(4.15,.18,1.62,.36,lobbyMat,-.95,floorY+.06,4.58));
+
+  const brandMat=new THREE.MeshStandardMaterial({
+    color:0x44396f,roughness:.28,metalness:.03,
+    emissive:0x5c50d8,emissiveIntensity:.11
+  });
+  office.add(roundedMesh(2.18,.78,.14,.09,brandMat,-1.05,1.03,4.03));
+
+  // abstract VORA symbol + wordmark strokes
+  const glow=new THREE.MeshStandardMaterial({
+    color:0x806ff8,emissive:0x806ff8,emissiveIntensity:.85,roughness:.16
+  });
+  office.add(roundedMesh(.52,.045,.025,.02,glow,-1.62,1.04,3.955));
+  office.add(roundedMesh(.86,.065,.025,.02,glow,-.82,1.04,3.955));
+}
+
+// Subtle circulation spine linking rooms.
+{
+  const corridor=new THREE.MeshStandardMaterial({color:0xe9e8ee,roughness:.44});
+  office.add(roundedMesh(1.34,.12,5.05,.28,corridor,-.05,floorY+.04,.62));
+  office.add(roundedMesh(4.30,.12,.92,.28,corridor,-.05,floorY+.04,3.56));
+}
+
+// Start loading actual assets.
+buildAssetOffice();
+
+function makeConnection(from,to,color=0x7fd3ce){
+  const points=[new THREE.Vector3(from.x,.34,from.z),new THREE.Vector3((from.x+to.x)/2,.39,(from.z+to.z)/2),new THREE.Vector3(to.x,.34,to.z)];
+  const curve=new THREE.CatmullRomCurve3(points);
+  const geo=new THREE.BufferGeometry().setFromPoints(curve.getPoints(35));
+  const mat=new THREE.LineDashedMaterial({color,transparent:true,opacity:.16,dashSize:.14,gapSize:.20});
+  const line=new THREE.Line(geo,mat);line.computeLineDistances();office.add(line);animatedItems.push({kind:"dash",obj:line,phase:Math.random()});
+  const packetMat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:.42});
+  for(let i=0;i<2;i++){
+    const packet=mesh(new THREE.SphereGeometry(.055,10,8),packetMat,0,0,0,false,false);
+    office.add(packet);
+    animatedItems.push({kind:"packet",obj:packet,curve,phase:i*.48+Math.random()*.2});
+  }
+}
+const wt=workers.get("watchtower").room;
+["sentinel","util","dataqa","reporter"].forEach(id=>{
+  const r=workers.get(id).room; makeConnection({x:wt.x,z:wt.z},{x:r.x,z:r.z}, workers.get(id).state==="attention"?0xe9858b:0x79cfc9);
+});
+
+// Label DOM elements.
+const labelEls = new Map();
+workerSeed.forEach(w=>{
+  const el=document.createElement("button");
+  el.type="button";
+  el.className=`worker-label ${w.state}`;
+  el.innerHTML=`<div class="label-top"><span class="number">${Number(w.code)}</span><div><div class="dept">${w.department}</div><div class="name">${w.name} / ${w.code}</div><div class="role">${w.role}</div><div class="state">${w.stateLabel}</div></div></div>`;
+  el.addEventListener("click",e=>{e.stopPropagation();selectWorker(w.id,true)});
+  labelsLayer.appendChild(el);
+  labelEls.set(w.id,el);
+});
+
+function projectLabels(){
+  const rect=sceneContainer.getBoundingClientRect();
+  const mobile=window.innerWidth<=900;
+  const a={
+    sentinel:{x:-2.55,z:-2.12,y:2.52,ox:-7,oy:-2},
+    dataqa:{x:-3.38,z:1.58,y:2.24,ox:-9,oy:4},
+    watchtower:{x:-.05,z:.60,y:2.30,ox:2,oy:7},
+    util:{x:2.65,z:-2.05,y:2.28,ox:8,oy:2},
+    reporter:{x:2.45,z:2.45,y:2.24,ox:7,oy:9}
+  };
+  workerSeed.forEach(w=>{
+    const k=a[w.id];
+    const p=new THREE.Vector3(k.x,k.y,k.z).project(camera);
+    let x=(p.x*.5+.5)*rect.width;
+    let y=(-p.y*.5+.5)*rect.height;
+    if(mobile){
+      x+=k.ox;y+=k.oy;
+      x=Math.max(47,Math.min(rect.width-47,x));
+      y=Math.max(105,Math.min(rect.height-82,y));
+    }
+    const el=labelEls.get(w.id);
+    el.style.left=`${x}px`;
+    el.style.top=`${y}px`;
+    el.style.display=p.z<1?"block":"none";
+  });
+}
+
+const raycaster=new THREE.Raycaster();
+const pointer=new THREE.Vector2();
+function pointerFromEvent(event){
+  const rect=renderer.domElement.getBoundingClientRect();
+  pointer.x=((event.clientX-rect.left)/rect.width)*2-1;
+  pointer.y=-((event.clientY-rect.top)/rect.height)*2+1;
+}
+renderer.domElement.addEventListener("pointermove",e=>{
+  pointerFromEvent(e);raycaster.setFromCamera(pointer,camera);
+  const hits=raycaster.intersectObjects([...robotObjects.values()],true);
+  renderer.domElement.style.cursor=hits.length?"pointer":"grab";
+});
+renderer.domElement.addEventListener("click",e=>{
+  pointerFromEvent(e);raycaster.setFromCamera(pointer,camera);
+  const hits=raycaster.intersectObjects([...robotObjects.values()],true);
+  if(hits.length){
+    const id=hits[0].object.userData.workerId;
+    if(id)selectWorker(id,true);
+  }
+});
+
+function setSelectedFloor(id){
+  roomObjects.forEach(({floor,baseEmissive,border,glowRail},key)=>{
+    floor.material.emissiveIntensity=key===id?.16:baseEmissive;
+    if(border)border.forEach(b=>b.material.opacity=key===id?.78:.22);
+    if(glowRail)glowRail.forEach(b=>b.material.opacity=key===id?.85:.40);
+  });
+  labelEls.forEach((el,key)=>el.classList.toggle("selected",key===id));
+}
+function updateInspector(w){
+  document.getElementById("worker-name").textContent=`${w.name} / ${w.code}`;
+  document.getElementById("worker-role").textContent=w.role;
+  const status=document.getElementById("worker-status");
+  status.className=`status-chip ${w.state}`;
+  status.innerHTML=`<i></i>${w.stateLabel}`;
+  document.getElementById("worker-assignment").textContent=w.assignment;
+  document.getElementById("worker-process").textContent=w.process;
+  document.getElementById("progress-label").textContent=`${w.progress}%`;
+  document.getElementById("progress-bar").style.width=`${w.progress}%`;
+  document.getElementById("metric-primary").textContent=w.primary;
+  document.getElementById("metric-primary-label").textContent=w.primaryLabel;
+  document.getElementById("metric-secondary").textContent=w.secondary;
+  document.getElementById("metric-secondary-label").textContent=w.secondaryLabel;
+  document.getElementById("metric-elapsed").textContent=w.elapsed;
+  document.getElementById("exec-id").textContent=w.execution;
+  document.getElementById("exec-node").textContent=w.node;
+  document.getElementById("exec-heartbeat").textContent=w.heartbeat;
+  document.getElementById("exec-checkin").textContent=w.checkin;
+}
+function selectWorker(id,focus=false){
+  if(!workers.has(id))return;
+  selectedId=id;
+  setSelectedFloor(id);
+  updateInspector(workers.get(id));
+  if(focus){
+    const w=workers.get(id), target=new THREE.Vector3(w.room.x,.65,w.room.z);
+    animateTarget(target);
+    if(window.innerWidth<=900){
+      document.querySelector(".inspector")?.classList.add("mobile-open");
+    }
+  }
+}
+selectWorker("sentinel");
+
+let targetTween=null;
+function animateTarget(target){
+  targetTween={
+    start:controls.target.clone(),
+    end:target.clone(),
+    startZoom:camera.zoom,
+    endZoom:window.innerWidth<=900?1.18:1.28,
+    t:0
+  };
+}
+function showToast(message){
+  toast.textContent=message;toast.classList.add("show");
+  clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove("show"),2200);
+}
+
+const connectionModal=document.getElementById("connection-modal");
+const connectionInput=document.getElementById("status-endpoint-input");
+if(!localStorage.getItem("dwhq_sentinel_status_endpoint")){localStorage.setItem("dwhq_sentinel_status_endpoint","https://mrantidata.app.n8n.cloud/webhook/sentinel-worker-status");}
+const connectionTest=document.getElementById("connection-test");
+const n8nConnectionState=document.getElementById("n8n-connection-state");
+const systemLiveEl=document.querySelector(".system-live");
+
+function setConnectionUI(mode,message){
+  n8nConnectionState.className=mode;
+  systemLiveEl.classList.remove("live-connected","live-error");
+  if(mode==="connected"){
+    n8nConnectionState.innerHTML="CONNECTED <i></i>";
+    systemLiveEl.classList.add("live-connected");
+  }else if(mode==="error"){
+    n8nConnectionState.innerHTML="ERROR <i></i>";
+    systemLiveEl.classList.add("live-error");
+  }else{
+    n8nConnectionState.innerHTML="CONNECT <i></i>";
+  }
+  if(message)connectionTest.textContent=message;
+}
+function openConnectionModal(){
+  connectionInput.value=localStorage.getItem("dwhq_sentinel_status_endpoint")||"";
+  connectionTest.textContent="";
+  connectionTest.className="connection-test";
+  connectionModal.classList.add("open");
+  connectionModal.setAttribute("aria-hidden","false");
+  setTimeout(()=>connectionInput.focus(),50);
+}
+function closeConnectionModal(){
+  connectionModal.classList.remove("open");
+  connectionModal.setAttribute("aria-hidden","true");
+}
+async function testStatusEndpoint(endpoint){
+  const url=endpoint+(endpoint.includes("?")?"&":"?")+"_="+Date.now();
+  const res=await fetch(url,{method:"GET",headers:{"Accept":"application/json"},cache:"no-store"});
+  if(!res.ok)throw new Error(`HTTP ${res.status}`);
+  const payload=await res.json();
+  if(!payload||!Array.isArray(payload.workers))throw new Error("Unexpected response format");
+  return payload;
+}
+
+document.getElementById("connection-close").addEventListener("click",closeConnectionModal);
+connectionModal.addEventListener("click",e=>{if(e.target===connectionModal)closeConnectionModal()});
+document.getElementById("connection-clear").addEventListener("click",()=>{
+  localStorage.removeItem("dwhq_sentinel_status_endpoint");
+  window.DWHQ_CONFIG.N8N_STATUS_ENDPOINT="";
+  connectionInput.value="";
+  setConnectionUI("disconnected");
+  connectionTest.className="connection-test";
+  connectionTest.textContent="Connection removed from this browser.";
+});
+document.getElementById("connection-save").addEventListener("click",async()=>{
+  const endpoint=connectionInput.value.trim();
+  if(!endpoint){
+    connectionTest.className="connection-test bad";
+    connectionTest.textContent="Paste the Worker Status production URL.";
+    return;
+  }
+  connectionTest.className="connection-test";
+  connectionTest.textContent="Testing connection…";
+  try{
+    const payload=await testStatusEndpoint(endpoint);
+    localStorage.setItem("dwhq_sentinel_status_endpoint",endpoint);
+    window.DWHQ_CONFIG.N8N_STATUS_ENDPOINT=endpoint;
+    setConnectionUI("connected");
+    connectionTest.className="connection-test ok";
+    connectionTest.textContent="Connected. SENTINEL is now reading n8n telemetry.";
+    applyTelemetryPayload(payload);
+    setTimeout(closeConnectionModal,850);
+  }catch(err){
+    setConnectionUI("error");
+    connectionTest.className="connection-test bad";
+    connectionTest.textContent=`Could not connect: ${err.message}`;
+  }
+});
+systemLiveEl.addEventListener("click",openConnectionModal);
+n8nConnectionState.addEventListener("click",openConnectionModal);
+
+document.querySelector(".close-button")?.addEventListener("click",()=>{
+  document.querySelector(".inspector")?.classList.remove("mobile-open");
+});
+document.querySelectorAll("[data-coming-soon]").forEach(btn=>btn.addEventListener("click",()=>showToast(`${btn.dataset.comingSoon} will be built after Command Centre.`)));
+document.getElementById("deploy-worker").addEventListener("click",()=>showToast("Deployment Bay reserved for your next automation worker."));
+document.getElementById("view-execution").addEventListener("click",()=>showToast("Execution deep-link will connect to n8n in the telemetry phase."));
+document.getElementById("open-n8n").addEventListener("click",()=>showToast("Add your n8n workflow URL later — no credentials will be stored here."));
+document.getElementById("investigate").addEventListener("click",()=>selectWorker("util",true));
+
+function resetCamera(){camera.userData.manualZoom=false;
+  if(window.innerWidth<=900){
+    camera.position.set(10.35,7.45,11.10);
+    camera.zoom=1.26;
+    controls.target.set(-.08,.80,.35);
+  }else{
+    camera.position.copy(startPosition);
+    camera.zoom=1.24;
+    controls.target.set(-.08,.80,.35);
+  }
+  camera.up.set(0,1,0);
+  camera.updateProjectionMatrix();
+  controls.enableRotate=true;controls.update();
+  document.getElementById("zoom-value").textContent=`${Math.round(camera.zoom*100)}%`;
+  document.getElementById("view-3d").classList.add("selected");
+  document.getElementById("view-2d").classList.remove("selected");
+}
+document.getElementById("reset-view").addEventListener("click",resetCamera);
+document.getElementById("fit-office").addEventListener("click",resetCamera);
+document.getElementById("rotate-view").addEventListener("click",()=>{
+  const a=Math.atan2(camera.position.z,camera.position.x)+Math.PI/4;
+  const r=Math.hypot(camera.position.x,camera.position.z);
+  camera.position.x=Math.cos(a)*r;camera.position.z=Math.sin(a)*r;controls.update();
+});
+function setZoom(delta){camera.userData.manualZoom=true;
+  camera.zoom=THREE.MathUtils.clamp(camera.zoom+delta,window.innerWidth<=900?1.02:.72,window.innerWidth<=900?1.85:2.3);camera.updateProjectionMatrix();
+  document.getElementById("zoom-value").textContent=`${Math.round(camera.zoom*100)}%`;
+}
+document.getElementById("zoom-in").addEventListener("click",()=>setZoom(.12));
+document.getElementById("zoom-out").addEventListener("click",()=>setZoom(-.12));
+controls.addEventListener("change",()=>document.getElementById("zoom-value").textContent=`${Math.round(camera.zoom*100)}%`);
+
+document.getElementById("view-2d").addEventListener("click",()=>{
+  camera.position.set(.01,22,.01);camera.up.set(0,0,-1);controls.target.set(0,0,0);controls.enableRotate=false;camera.zoom=.88;camera.updateProjectionMatrix();controls.update();
+  document.getElementById("view-2d").classList.add("selected");document.getElementById("view-3d").classList.remove("selected");
+});
+document.getElementById("view-3d").addEventListener("click",()=>{
+  camera.up.set(0,1,0);resetCamera();
+});
+
+// Safe telemetry hook.
+// The public GET status endpoint returns display-safe data only.
+function applyTelemetryPayload(payload){
+  if(Array.isArray(payload?.workers)){
+    payload.workers.forEach(patch=>{
+      if(!patch.id||!workers.has(patch.id))return;
+      Object.assign(workers.get(patch.id),patch);
+      const label=labelEls.get(patch.id);
+      if(label){
+        const w=workers.get(patch.id);
+        label.className=`worker-label ${w.state}${patch.id===selectedId?" selected":""}`;
+        label.querySelector(".state").textContent=w.stateLabel||String(w.state).toUpperCase();
+      }
+    });
+    updateInspector(workers.get(selectedId));
+    setSelectedFloor(selectedId);
+    updateCounts();
+  }
+  if(payload?.syncedAt){
+    document.getElementById("last-sync").childNodes[0].nodeValue=payload.syncedAt+" ";
+  }
+}
+
+async function pollN8n(){
+  const endpoint=window.DWHQ_CONFIG?.N8N_STATUS_ENDPOINT ||
+    localStorage.getItem("dwhq_sentinel_status_endpoint") || "";
+  if(!endpoint){
+    setConnectionUI("disconnected");
+    return;
+  }
+  try{
+    const payload=await testStatusEndpoint(endpoint);
+    applyTelemetryPayload(payload);
+    setConnectionUI("connected");
+  }catch(err){
+    console.warn("n8n telemetry unavailable:",err);
+    setConnectionUI("error");
+  }
+}
+function updateCounts(){
+  let working=0,resting=0,attention=0;
+  workers.forEach(w=>{
+    if(w.state==="working"||w.state==="active")working++;
+    if(w.state==="resting"||w.state==="scheduled")resting++;
+    if(w.state==="attention"||w.state==="warning"||w.state==="offline")attention++;
+  });
+  document.getElementById("count-working").textContent=String(working).padStart(2,"0");
+  document.getElementById("count-resting").textContent=String(resting).padStart(2,"0");
+  document.getElementById("count-attention").textContent=String(attention).padStart(2,"0");
+}
+updateCounts();
+pollN8n();
+setInterval(pollN8n,window.DWHQ_CONFIG?.POLL_INTERVAL_MS||15000);
+
+function resize(){
+  const w=sceneContainer.clientWidth,h=sceneContainer.clientHeight;
+  renderer.setSize(w,h,false);
+  const aspect=w/h;
+  if(aspect < 0.82){
+    const horizontalHalf=5.18;
+    camera.left=-horizontalHalf;
+    camera.right=horizontalHalf;
+    camera.top=horizontalHalf/aspect;
+    camera.bottom=-horizontalHalf/aspect;
+  }else{
+    const verticalHalf=5.35;
+    camera.left=-verticalHalf*aspect;
+    camera.right=verticalHalf*aspect;
+    camera.top=verticalHalf;
+    camera.bottom=-verticalHalf;
+  }
+  camera.updateProjectionMatrix();
+}
+window.addEventListener("resize",resize);resize();
+if(window.innerWidth<=900){
+  camera.position.set(10.35,7.45,11.10);
+  controls.target.set(-.08,.80,.35);
+  camera.zoom=1.26;
+  camera.updateProjectionMatrix();
+  controls.update();
+}
+
+const clock=new THREE.Clock();
+
+
+
+
+
+
+function updateAssetMobileFraming(){
+  if(window.innerWidth>900 || camera.userData.manualZoom)return;
+  const az=Math.abs(controls.getAzimuthalAngle());
+  const folded=Math.abs(((az+Math.PI/4)%(Math.PI/2))-Math.PI/4);
+  const sideFactor=Math.sin(folded*2);
+  const desired=1.26-sideFactor*.10;
+  camera.zoom+=(desired-camera.zoom)*.065;
+  camera.updateProjectionMatrix();
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  updateAssetMobileFraming();
+const t=clock.getElapsedTime();
+  controls.update();
+
+  if(targetTween){
+    targetTween.t=Math.min(1,targetTween.t+.035);
+    const eased=1-Math.pow(1-targetTween.t,3);
+    controls.target.lerpVectors(targetTween.start,targetTween.end,eased);
+    camera.zoom=THREE.MathUtils.lerp(targetTween.startZoom,targetTween.endZoom,eased);
+    camera.updateProjectionMatrix();
+    if(targetTween.t>=1)targetTween=null;
+  }
+
+  const dt=Math.min(.05,Math.max(0,t-(animate._lastT||t)));
+  animate._lastT=t;
+  robotMixers.forEach(m=>m.update(dt));
+
+  robotObjects.forEach((robot,id)=>{
+    if(!robot?.userData?.assetRobot)return;
+    const state=assetRobotState.get(id);
+    const w=workers.get(id);
+    if(!state||!w)return;
+
+    robot.position.y=state.baseY;
+
+    if(id==="sentinel" && (w.state==="working"||w.state==="completed")){
+      robot.rotation.y=state.baseRot+Math.sin(t*.65)*.035;
+      robot.position.y=state.baseY+Math.sin(t*1.8)*.008;
+    }else if(id==="dataqa" && w.state==="working"){
+      robot.rotation.y=state.baseRot+Math.sin(t*.55)*.055;
+      robot.position.y=state.baseY+Math.sin(t*1.5+.8)*.007;
+    }else if(id==="watchtower"){
+      robot.rotation.y=state.baseRot+Math.sin(t*.35)*.075;
+    }else if(id==="util" || w.state==="attention"){
+      robot.rotation.y=state.baseRot+Math.sin(t*2.4)*.028;
+      robot.position.y=state.baseY+Math.abs(Math.sin(t*2.2))*.008;
+    }else if(id==="reporter" || w.state==="resting"){
+      robot.rotation.y=state.baseRot+Math.sin(t*.25)*.018;
+    }
+  });
+
+  animatedItems.forEach(item=>{
+    if(item.kind==="conveyor"){
+      item.obj.position.x=item.origin.x+((t*.34+item.phase)%2.4);
+      if(item.obj.position.x>item.origin.x+2.35)item.obj.position.x-=2.4;
+      item.obj.rotation.y=Math.sin(t*1.4+item.phase)*.04;
+    }
+    if(item.kind==="qa"){
+      item.obj.position.x=item.origin.x+Math.sin(t*.8+item.phase)*.08;
+      item.obj.position.y=item.origin.y+Math.max(0,Math.sin(t*1.25+item.phase))*.035;
+    }
+    if(item.kind==="blink")item.obj.visible=Math.sin(t*5)>-.2;
+    if(item.kind==="ring")item.obj.rotation.z=t*.22;
+    if(item.kind==="ringReverse")item.obj.rotation.z=-t*.31;
+    if(item.kind==="dash")item.obj.material.dashOffset=-t*.35;
+    if(item.kind==="packet"){
+      const u=(t*.12+item.phase)%1;
+      const p=item.curve.getPointAt(u);
+      item.obj.position.copy(p);
+      item.obj.position.y+=.06+Math.sin(t*3+item.phase)*.018;
+    }
+    if(item.kind==="scanner"){
+      item.obj.position.z=Math.sin(t*2.8+item.phase)*.18;
+      item.obj.material.opacity=.28+Math.abs(Math.sin(t*3.4+item.phase))*.42;
+    }
+    if(item.kind==="screenPulse"){
+      item.obj.material.emissiveIntensity=.20+Math.abs(Math.sin(t*.8+item.phase))*.18;
+    }
+    if(item.kind==="beacon"){
+      item.obj.material.emissiveIntensity=.45+Math.abs(Math.sin(t*4.8+item.phase))*1.6;
+      item.obj.scale.setScalar(.92+Math.abs(Math.sin(t*4.8+item.phase))*.16);
+    }
+    if(item.kind==="statusGlow"){
+      item.obj.material.emissiveIntensity=.28+Math.abs(Math.sin(t*1.8+item.phase))*.48;
+    }
+  });
+
+  projectLabels();
+  renderer.render(scene,camera);
+}
+animate();
+
+</script>
+
+  <div class="connection-modal" id="connection-modal" aria-hidden="true">
+    <div class="connection-dialog" role="dialog" aria-modal="true" aria-labelledby="connection-title">
+      <div class="connection-dialog-head">
+        <div>
+          <span class="eyebrow">LIVE TELEMETRY</span>
+          <h2 id="connection-title">Connect n8n</h2>
+        </div>
+        <button type="button" id="connection-close" aria-label="Close">×</button>
+      </div>
+      <p>Paste the <strong>production GET URL</strong> from the <strong>Worker Status Webhook</strong>. This endpoint returns display-safe status only.</p>
+      <label for="status-endpoint-input">SENTINEL status URL</label>
+      <input id="status-endpoint-input" type="url" inputmode="url" autocomplete="off" placeholder="https://.../webhook/sentinel-worker-status">
+      <div class="connection-actions">
+        <button type="button" id="connection-clear" class="connection-secondary">CLEAR</button>
+        <button type="button" id="connection-save" class="connection-primary">CONNECT</button>
+      </div>
+      <div class="connection-test" id="connection-test" aria-live="polite"></div>
+    </div>
+  </div>
+
+</body>
+</html>
